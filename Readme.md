@@ -8,6 +8,7 @@ The program needs to return an integer exit code, with 0 meaning success.  Anyth
 Since a return value is needed, the declaration for Main() should be: Function Main() As Integer.  The usual declaration, Sub Main(), does not return a value.
 
 Housekeeper launches the program as follows:
+
     Dim ExternalProgram As String = Configuration("TextBoxExternalProgramAssembly")
     Dim P As New Process
     Dim ExitCode As Integer
@@ -27,8 +28,11 @@ Repo https://github.rmcanany.com/SolidEdgeHousekeeperExternalProgramExamples
 
 
 The format for error_messages.txt is:
-error_number<space>error message text
-E.g.,
+
+error_number (space character) error message text
+
+For example
+
 1 Some error occurred
 2 Some other error occurred
 
