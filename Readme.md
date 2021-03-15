@@ -33,9 +33,8 @@ error_number (space character) error message text
 
 For example
 
-1 Some error occurred
-
-2 Some other error occurred
+1. Some error occurred
+2. Some other error occurred
 
 If the ExitCode is not 0, and the file is present, Solid Edge Housekeeper will include the error message in its log file, otherwise it will simply list the exit code.
 
