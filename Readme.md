@@ -36,3 +36,4 @@ For example
 
 If the `ExitCode` is not `0`, and the file is present, Solid Edge Housekeeper will include the error message in its log file, otherwise it will simply list the exit code.
 
+Most developers will want the source code, however a compiled version of the example programs is available.  See https://github.com/rmcanany/HousekeeperExternalPrograms/releases/
