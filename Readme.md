@@ -29,7 +29,7 @@ Repo https://github.rmcanany.com/SolidEdgeHousekeeperExternalProgramExamples
 
 The format for error_messages.txt is:
 
-error_number (space character) error message text
+`error_number<space character>error message text`
 
 For example
 ```
