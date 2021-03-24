@@ -1,8 +1,11 @@
 # Solid Edge Housekeeper External Programs
+2021 Robert McAnany
 
 Description and examples for Solid Edge Housekeeper 'Run External Program' task.
 
 The external program is a Console App that works on a single Solid Edge file.  Housekeeper serves up files one at a time for processing.  
+
+## Requirements
 
 The program needs to return an integer exit code, with `0` meaning success.  Anything else indicates an error.  You can optionally supply a text file, `error_messages.txt` -- in the same directory as the executable, to provide feedback to the user.  The format is given below.
 
@@ -24,6 +27,8 @@ Housekeeper maintains a reference to the file being processed.  If that referenc
 
 No assumptions are made about what the external program does.  If you change a file and want to save it, that needs to be in the program.  If you open another file, you need to close it.
 
+## Error Message File Format
+
 The format for `error_messages.txt` is:
 
 `error_number<space character>error message text`
@@ -36,4 +41,6 @@ For example
 
 If the `ExitCode` is not `0`, and the file is present, Solid Edge Housekeeper will include the error message in its log file, otherwise it will simply list the exit code.
 
-Most developers will want the source code, however a compiled version of the example programs is available.  See https://github.com/rmcanany/HousekeeperExternalPrograms/releases/
+## Releases
+
+Most developers will want the source code, however compiled versions of the example programs are available.  See https://github.com/rmcanany/HousekeeperExternalPrograms/releases/
