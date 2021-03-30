@@ -1,7 +1,7 @@
 # Solid Edge Housekeeper External Programs
 2021 Robert McAnany
 
-Description and examples for Solid Edge Housekeeper 'Run External Program' task.
+Description and examples for Solid Edge Housekeeper `Run External Program` task.
 
 The external program is a Console App that works on a single Solid Edge file.  Housekeeper serves up files one at a time for processing.  
 
@@ -21,7 +21,7 @@ Housekeeper launches the program as follows:
     P.WaitForExit()
     ExitCode = P.ExitCode
 
-No arguments are passed to the program.  If you need to get a value from Housekeeper, such as a template file location, you can parse the defaults.txt file in Housekeeper's installation directory.  The file is updated just before processing is launched.  It should always reflect the current status of the form.
+No arguments are passed to the program.  If you need to get a value from Housekeeper, such as a template file location, you can parse the `defaults.txt` file in Housekeeper's installation directory.  The file is updated just before processing is launched.  It should always reflect the current status of the form.
 
 Housekeeper maintains a reference to the file being processed.  If that reference is broken, an exception will occur.  To avoid that, do not perform `Close()` or `SaveAs()` on the document.
 

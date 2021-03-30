@@ -16,6 +16,8 @@ Module Module1
         Dim seApp As SolidEdgeFramework.Application = Nothing
         Dim seDoc As SolidEdgeDraft.DraftDocument = Nothing
 
+        Dim Suffix As String
+
         Try
             seApp = CType(Runtime.InteropServices.Marshal.GetActiveObject("SolidEdge.Application"), Application)
             seDoc = CType(seApp.ActiveDocument, DraftDocument)
@@ -34,6 +36,8 @@ Module Module1
 
             Dim seViews As DrawingViews = Nothing
 
+            Suffix = GetSuffix()
+
             Try
                 ' In case this program has already run this file, first rename sheets to random values
                 For Each seSheet As Sheet In seSheets
@@ -47,9 +51,10 @@ Module Module1
                 For Each seSheet As Sheet In seSheets
                     seViews = seSheet.DrawingViews
                     If seViews.Count > 0 Then
-                        Sheetname = Rename(seViews, Sheetnames)
+                        Sheetname = Rename(seViews, Sheetnames, Suffix)
                         seSheet.Name = Sheetname
                         Sheetnames.Add(Sheetname)
+                        Console.WriteLine(Sheetname)
                     End If
                 Next
             Catch ex As Exception
@@ -70,7 +75,7 @@ Module Module1
     End Function
 
 
-    Private Function Rename(seViews As DrawingViews, Sheetnames As List(Of String)) As String
+    Private Function Rename(seViews As DrawingViews, Sheetnames As List(Of String), Suffix As String) As String
         ' Sheet names need to be unique.  This function handles the case where two sheets have the same first ModelLink
         Dim BaseName As String
         Dim Name As String
@@ -86,11 +91,26 @@ Module Module1
         Name = BaseName
 
         While Sheetnames.Contains(Name)
-            Name = String.Format("{0}-Copy({1})", BaseName, count)
+            Name = String.Format("{0}-{1}({2})", BaseName, Suffix, count)
             count += 1
         End While
 
         Return Name
+    End Function
+
+    Function GetSuffix() As String
+        Dim Suffix As String = "Copy"
+        Dim StartupPath As String = AppDomain.CurrentDomain.BaseDirectory
+
+        Dim Filename As String = String.Format("{0}suffix.txt", StartupPath)
+
+        Try
+            Suffix = IO.File.ReadAllLines(Filename)(0)
+        Catch ex As Exception
+            Console.WriteLine(String.Format("Problem processing {0}", Filename))
+        End Try
+
+        Return Suffix
     End Function
 
 End Module
