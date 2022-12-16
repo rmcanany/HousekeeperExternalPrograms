@@ -1,5 +1,5 @@
 ' Robert McAnany 2022
-' Script demonstrating a few
+' A more complete example of interacting with Solid Edge Housekeeper.
 ' See helpful links and other information at the bottom of this script.
 
 Dim ErrorMessageArray(10)
