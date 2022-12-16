@@ -11,6 +11,7 @@ Module Module1
 		Dim SEDoc As SolidEdgeFramework.SolidEdgeDocument
 
 		Dim Configuration As New Dictionary(Of String, String)
+		Dim ErrorMessageList As New List(Of String)
 
 		Configuration = GetConfiguration()
 
@@ -19,10 +20,10 @@ Module Module1
 		'RadioButtonPictorialViewDimetric = False
 		'RadioButtonPictorialViewIsometric = False
 
-		SEApp = CType(Runtime.InteropServices.Marshal.GetActiveObject("SolidEdge.Application"), SolidEdgeFramework.Application)
-		SEDoc = CType(SEApp.ActiveDocument, SolidEdgeFramework.SolidEdgeDocument)
-
 		Try
+			SEApp = CType(Runtime.InteropServices.Marshal.GetActiveObject("SolidEdge.Application"), SolidEdgeFramework.Application)
+			SEDoc = CType(SEApp.ActiveDocument, SolidEdgeFramework.SolidEdgeDocument)
+
 			If SEApp.ActiveDocumentType = SolidEdgeFramework.DocumentTypeConstants.igAssemblyDocument Then
 				Try
 					If Configuration("RadioButtonPictorialViewIsometric").ToLower = "true" Then
@@ -35,7 +36,8 @@ Module Module1
 						SEApp.StartCommand(CType(SolidEdgeConstants.AssemblyCommandConstants.AssemblyViewTrimetricView, SolidEdgeFramework.SolidEdgeCommandConstants))
 					End If
 				Catch ex As Exception
-					ExitCode = 4
+					ExitCode = 1
+					ErrorMessageList.Add("Error fitting view")
 				End Try
 
 				SEApp.StartCommand(CType(SolidEdgeConstants.AssemblyCommandConstants.AssemblyViewFit, SolidEdgeFramework.SolidEdgeCommandConstants))
@@ -53,7 +55,8 @@ Module Module1
 					End If
 
 				Catch ex As Exception
-					ExitCode = 4
+					ExitCode = 1
+					ErrorMessageList.Add("Error fitting view")
 				End Try
 
 				SEApp.StartCommand(CType(SolidEdgeConstants.PartCommandConstants.PartViewFit, SolidEdgeFramework.SolidEdgeCommandConstants))
@@ -71,7 +74,8 @@ Module Module1
 					End If
 
 				Catch ex As Exception
-					ExitCode = 4
+					ExitCode = 1
+					ErrorMessageList.Add("Error fitting view")
 				End Try
 
 				SEApp.StartCommand(CType(SolidEdgeConstants.PartCommandConstants.PartViewFit, SolidEdgeFramework.SolidEdgeCommandConstants))
@@ -82,25 +86,43 @@ Module Module1
 
 			Else
 				ExitCode = 1
+				ErrorMessageList.Add("Unrecognized document type")
+			End If
+
+			If ExitCode = 0 Then
+				If SEDoc.ReadOnly Then
+					ExitCode = 1
+					ErrorMessageList.Add("Cannot save read-only document")
+				Else
+					SEDoc.Save()
+					SEApp.DoIdle()
+				End If
 			End If
 
 		Catch ex As Exception
-			ExitCode = 2
+			ExitCode = 1
+			ErrorMessageList.Add("Error connecting to Solid Edge")
 		End Try
 
-		If ExitCode = 0 Then
-			If SEDoc.ReadOnly Then
-				ExitCode = 3
-			Else
-				SEDoc.Save()
-				SEApp.DoIdle()
-			End If
+		If ExitCode <> 0 Then
+			SaveErrorMessages(ErrorMessageList)
 		End If
-
 		Console.WriteLine("FitIsoView complete")
 
 		Return ExitCode
 	End Function
+
+
+	Private Sub SaveErrorMessages(ErrorMessageList As List(Of String))
+		Dim ErrorFilename As String
+		Dim StartupPath As String = System.AppDomain.CurrentDomain.BaseDirectory
+
+		ErrorFilename = String.Format("{0}\error_messages.txt", StartupPath)
+
+		IO.File.WriteAllLines(ErrorFilename, ErrorMessageList)
+
+	End Sub
+
 
 	Private Function GetConfiguration() As Dictionary(Of String, String)
         Dim Configuration As New Dictionary(Of String, String)
