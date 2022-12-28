@@ -14,7 +14,7 @@ Dim ReportType
 Dim ReportFile
 Dim Cmd
 
-ProgramName = "C:\Program Files\Siemens\Solid Edge 2021\Program\report.exe"
+ProgramName = "C:\Program Files\Siemens\Solid Edge 2022\Program\report.exe"
 AssemblyFile = oDoc.FullName
 ReportType = "ASM_ATOMIC_PARTS"  ' See options in the Command Line Arguments link.
 ReportFile = Replace(AssemblyFile, ".asm", ".txt")

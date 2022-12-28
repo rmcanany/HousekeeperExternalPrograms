@@ -72,6 +72,8 @@ End If
 
 BuildDXFFilename()
 
+'WScript.Echo DXFFilename
+
 if Err Then
     Err.Clear
     AddErrorMessage("Error creating DXF filename '" & DXFFilename & "'")
