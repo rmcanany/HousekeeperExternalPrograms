@@ -33,9 +33,29 @@ Housekeeper maintains a reference to the file being processed.  If that referenc
 
 No assumptions are made about what the external program does.  If you change a file and want to save it, that needs to be in the program.  If you open another file, you need to close it.  One exception is that Housekeeper has a global option to save the file after processing.  It is set on the Configuration tab.
 
+## Other repos and sources for macros
+
+To suggest other sources, including your own, feel free to message me, RobertMcAnany, on the [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge) .
+
+If you want someone to write a macro for you, I know a couple of guys who do it
+for a living.  Message me on the Forum and I'll pass along the request.
+
+Jason Newell [**SolidEdgeCommunity**](https://github.com/SolidEdgeCommunity)
+
+Tushar Suradkar [**SurfAndCode**](http://www.surfandcode.in/2014/01/index-of-all-tutorials-on-this-solid.html)
+
+Jason Titcomb [**LMGiJason**](https://github.com/LMGiJason)
+
+Wolfgang Hackl [**Cadcam-Consult**](http://cadcam-consult.com/Page_00/index.html)
+
+Kabir Costa [**KCMacros**](https://www.kcmacros.com/) [KabirCosta](https://github.com/kabircosta)
+
+Alan Pope [**Cadcentral NZ**](https://www.cadcentral.co.nz/macros)
+
+
 ## Releases
 
-Most developers will want the source code, however compiled versions of the example programs are available.  See https://github.com/rmcanany/HousekeeperExternalPrograms/releases/
+Most developers will want the source code, however [**Compiled Versions**](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/) of the example programs are available.
 
 
 
