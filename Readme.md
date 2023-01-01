@@ -36,7 +36,7 @@ No assumptions are made about what the external program does.  If you change a f
 ## Other repos and sources for macros
 
 Sample programs may be the easiest way to get started automating Solid Edge yourself. 
-Here are some places to try:
+Here are a few sites to check out:
 
 Jason Newell [**SolidEdgeCommunity**](https://github.com/SolidEdgeCommunity)
 
