@@ -35,10 +35,8 @@ No assumptions are made about what the external program does.  If you change a f
 
 ## Other repos and sources for macros
 
-To suggest other sources, including your own, feel free to message me, RobertMcAnany, on the [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge) .
-
-If you want someone to write a macro for you, I know a couple of guys who do it
-for a living.  Message me on the Forum and I'll pass along the request.
+Sample programs may be the easiest way to get started automating Solid Edge yourself. 
+Here are some places to try:
 
 Jason Newell [**SolidEdgeCommunity**](https://github.com/SolidEdgeCommunity)
 
@@ -52,10 +50,15 @@ Kabir Costa [**KCMacros**](https://www.kcmacros.com/), [**KabirCosta**](https://
 
 Alan Pope [**Cadcentral NZ**](https://www.cadcentral.co.nz/macros)
 
+To suggest other sources, including your own, feel free to message me, RobertMcAnany, on the [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge).
+
+If you're looking for someone to create a program *for* you, I know a couple of folks who do it
+for a living.  Message me on the Forum and I'll pass along the request.
+
 
 ## Releases
 
-Most developers will want the source code, however [**Compiled Versions**](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/) of the example programs are available.
+Most developers will want the source code, however compiled versions are available [**here**](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/).
 
 
 
