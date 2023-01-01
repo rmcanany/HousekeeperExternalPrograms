@@ -5,7 +5,7 @@ Module Module1
 
 		Console.WriteLine("AddRemoveCustomProperties starting...")
 
-		Dim ExitCode As Integer = 0  ' 0 means success.  Error messages are stored in error_messages.txt.  Edit as required.
+		Dim ExitCode As Integer = 0  ' 0 means success.  For a more complete example, see FitISOView.
 
 		Dim SEApp As SolidEdgeFramework.Application
 		Dim SEDoc As SolidEdgeFramework.SolidEdgeDocument
