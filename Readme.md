@@ -48,7 +48,7 @@ Jason Titcomb [**LMGiJason**](https://github.com/LMGiJason)
 
 Wolfgang Hackl [**Cadcam-Consult**](http://cadcam-consult.com/Page_00/index.html)
 
-Kabir Costa [**KCMacros**](https://www.kcmacros.com/) [KabirCosta](https://github.com/kabircosta)
+Kabir Costa [**KCMacros**](https://www.kcmacros.com/), [**KabirCosta**](https://github.com/kabircosta)
 
 Alan Pope [**Cadcentral NZ**](https://www.cadcentral.co.nz/macros)
 
