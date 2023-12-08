@@ -28,7 +28,7 @@ exactly one model body and one flat pattern.
 
 Setting the threshold requires some experimentation.
 That is because `NVD` depends on the neutral factor.
-On parts with a neutral facor other than 0.5, 
+On parts with a neutral factor other than 0.5, 
 it also depends on the number of bends relative to
 the overall size of the part.  In a part with no bends,
 `NVD` should be very close to 0.  In a small part
