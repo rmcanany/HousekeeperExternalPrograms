@@ -131,6 +131,8 @@ Module Module1
         Dim Value As String
 		Dim DefaultsFilename As String
 		Dim StartupPath As String = System.AppDomain.CurrentDomain.BaseDirectory
+		Dim KVPairList As New List(Of String)
+		Dim i As Integer
 
 		DefaultsFilename = String.Format("{0}\defaults.txt", StartupPath)
 
@@ -142,10 +144,18 @@ Module Module1
                     Continue For
                 End If
 
-                Key = KVPair.Split("="c)(0)
-                Value = KVPair.Split("="c)(1)
+				KVPairList = KVPair.Split("="c)
+				Key = KVPairList(0)
 
-                Configuration(Key) = Value
+				For i = 1 To KVPairList.count - 1
+					If i = 1 Then
+						Value = KVPairList(i)
+					Else
+						Value = String.format("{}={}", Value, KVPairList(i))
+					End If
+				Next
+
+				Configuration(Key) = Value
             Next
 
         Catch ex As Exception
