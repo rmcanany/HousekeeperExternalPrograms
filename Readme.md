@@ -77,6 +77,8 @@ Kabir Costa [**KabirCosta**](https://github.com/kabircosta)
 
 Alan Pope [**Cadcentral NZ**](https://www.cadcentral.co.nz/macros)
 
+UK Dave [**uk-dave**](https://github.com/uk-dave/SolidEdge)
+
 To suggest other sources, including your own, feel free to message me, 
 RobertMcAnany, on the 
 [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge).

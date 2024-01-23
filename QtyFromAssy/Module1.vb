@@ -57,24 +57,24 @@ Module Module1
 
 		If ExitCode = 0 Then
 
-			' Save and close assembly
-			SourceAssyfilename = SEDoc.FullName
-			Console.WriteLine("Closing assembly")
-			SEDoc.Save()
-			SEApp.DoIdle()
-			SEDoc.Close()
-			SEApp.DoIdle()
+			'' Save and close assembly
+			'SourceAssyfilename = SEDoc.FullName
+			'Console.WriteLine("Closing assembly")
+			'SEDoc.Save()
+			'SEApp.DoIdle()
+			'SEDoc.Close()
+			'SEApp.DoIdle()
 
 			' Add the properties to each file.
 			PopulateProps(BomDict, PropDict, ProgramSettings("QuantityPropertyName"))
 
-			' Reopen assembly
-			Console.WriteLine("Opening assembly")
-			SEApp.Documents.Open(SourceAssyfilename)
-			SEApp.DoIdle()
-			SEApp.DisplayAlerts = True
+			'' Reopen assembly
+			'Console.WriteLine("Opening assembly")
+			'SEApp.Documents.Open(SourceAssyfilename)
+			'SEApp.DoIdle()
+			'SEApp.DisplayAlerts = True
 
-			SEDoc = CType(SEApp.ActiveDocument, SolidEdgeAssembly.AssemblyDocument)
+			'SEDoc = CType(SEApp.ActiveDocument, SolidEdgeAssembly.AssemblyDocument)
 
 		End If
 
