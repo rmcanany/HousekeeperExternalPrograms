@@ -57,7 +57,7 @@ Chris Clems [**ChrisClems**](https://github.com/ChrisClems)
 
 NosyBottle [**NosyBottle**](https://github.com/Nosybottle)
 
-ZaPpInG [**ZaPpInG**](https://github.com/lrmoreno007)
+ZaPpInG [**lrmoreno007**](https://github.com/lrmoreno007)
 
 To suggest other sources, including your own, feel free to message me, RobertMcAnany, on the [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge).
 
