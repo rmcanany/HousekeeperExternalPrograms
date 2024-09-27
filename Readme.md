@@ -19,17 +19,25 @@ If the `ExitCode` is not `0`, and your program does not implement error reportin
 
 Housekeeper launches the program as follows:
 
-    Dim ExternalProgram As String = Configuration("TextBoxExternalProgramAssembly")
     Dim P As New Process
     Dim ExitCode As Integer
+    Extension = IO.Path.GetExtension(Me.ExternalProgram)
 
-    P = Process.Start(ExternalProgram)
+    If Extension = ".ps1" Then
+        P.StartInfo.FileName = "powershell.exe"
+        P.StartInfo.Arguments = String.Format("-command {1}{0}{1}", Me.ExternalProgram, Chr(34))
+        P.Start()
+    Else
+        P = Diagnostics.Process.Start(Me.ExternalProgram)
+    End If
+
     P.WaitForExit()
     ExitCode = P.ExitCode
 
-No arguments are passed to the program. If you need to get a value from Housekeeper, such as a template file location, you can use the function `GetConfiguration()` as shown in `FitIsoView`, or `GetConfigurationValue()` in `ChangeToInchAndSaveAsFlatDXF.vbs`. These functions parse the `defaults.txt` file passed into the macro's startup directory. The file is updated just before processing is launched. It should always reflect the current status of the form.
 
-Housekeeper maintains a reference to the file being processed. If that reference is broken, an exception will occur. To avoid that, do not perform `Close()` or `SaveAs()` on the document.
+No arguments are passed to the program. If you need to get a value from Housekeeper, such as a template file location, you can use the function `GetSettings()` as shown in `FitIsoView`. The function parses the `form_main_settings.json` file passed into the macro's startup directory. The file is updated just before processing is launched. It should always reflect the current status of the form.
+
+Housekeeper maintains a `reference` to the file being processed. If that reference is broken, an exception will occur. To avoid that, do not perform `Close()` or `SaveAs()` (`SaveCopyAs()` is OK) on the document.
 
 No assumptions are made about what the external program does. If you change a file and want to save it, that needs to be in the program.  If you open another file, you need to close it. One exception is that Housekeeper has a global option to save the file after processing.  It is set on the Configuration tab.
 

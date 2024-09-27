@@ -7,7 +7,7 @@ ErrorMessageIdx = 0
 ErrorCode = 0
 
 ScriptDir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
-DefaultsFileName = ScriptDir & "\defaults.txt"
+'DefaultsFileName = ScriptDir & "\defaults.txt"
 ErrorMessageFile = ScriptDir & "\error_messages.txt"
 
 
@@ -148,37 +148,37 @@ Private Sub SaveErrorMessages()
     Set objFileToWrite = Nothing
 End Sub
 
-Private Function GetConfigurationValue(Key)
-    ' You can find the settings on the Housekeeper dialog by manually inspecting defaults.txt
-    ' They are stored as key-value pairs.
-    ' The key is the text on the left of the '='.  The value is on the right.
-    
-    GetConfigurationValue = ""
-    
-    Dim Separator
-    Dim SepPos
-    Dim K
-    Dim V
-    Dim Line
+'Private Function GetConfigurationValue(Key)
+'    ' You can find the settings on the Housekeeper dialog by manually inspecting defaults.txt
+'    ' They are stored as key-value pairs.
+'    ' The key is the text on the left of the '='.  The value is on the right.
+'    
+'    GetConfigurationValue = ""
+'    
+'    Dim Separator
+'    Dim SepPos
+'    Dim K
+'    Dim V
+'    Dim Line
 
-    Separator = "="
+'    Separator = "="
 
-    Set DefaultsFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(DefaultsFileName, 1)
+'    Set DefaultsFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(DefaultsFileName, 1)
 
-    Do While Not DefaultsFile.AtEndOfStream
-         Line = DefaultsFile.ReadLine()
-         SepPos = Instr(Line, Separator)
-         K = Left(Line, SepPos - 1)
-         V = Right(Line, Len(Line) - SepPos)
-         If K = Key Then
-             GetConfigurationValue = V
-        End If
-    Loop
-    
-    DefaultsFile.Close
-    Set DefaultsFile = Nothing
-    
-End Function
+'    Do While Not DefaultsFile.AtEndOfStream
+'         Line = DefaultsFile.ReadLine()
+'         SepPos = Instr(Line, Separator)
+'         K = Left(Line, SepPos - 1)
+'         V = Right(Line, Len(Line) - SepPos)
+'         If K = Key Then
+'             GetConfigurationValue = V
+'        End If
+'    Loop
+'    
+'    DefaultsFile.Close
+'    Set DefaultsFile = Nothing
+'    
+'End Function
 
 ' HELPFUL LINKS
 

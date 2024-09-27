@@ -168,36 +168,36 @@ Module Module1
 	End Function
 
 
-	Private Function GetConfiguration() As Dictionary(Of String, String)
-		Dim Configuration As New Dictionary(Of String, String)
-		Dim Defaults As String() = Nothing
-		Dim Key As String
-		Dim Value As String
-		Dim DefaultsFilename As String
-		Dim StartupPath As String = System.AppDomain.CurrentDomain.BaseDirectory
+	'Private Function GetConfiguration() As Dictionary(Of String, String)
+	'	Dim Configuration As New Dictionary(Of String, String)
+	'	Dim Defaults As String() = Nothing
+	'	Dim Key As String
+	'	Dim Value As String
+	'	Dim DefaultsFilename As String
+	'	Dim StartupPath As String = System.AppDomain.CurrentDomain.BaseDirectory
 
-		DefaultsFilename = String.Format("{0}\defaults.txt", StartupPath)
+	'	DefaultsFilename = String.Format("{0}\defaults.txt", StartupPath)
 
-		Try
-			Defaults = IO.File.ReadAllLines(DefaultsFilename)
+	'	Try
+	'		Defaults = IO.File.ReadAllLines(DefaultsFilename)
 
-			For Each KVPair As String In Defaults
-				If Not KVPair.Contains("=") Then
-					Continue For
-				End If
+	'		For Each KVPair As String In Defaults
+	'			If Not KVPair.Contains("=") Then
+	'				Continue For
+	'			End If
 
-				Key = KVPair.Split("="c)(0)
-				Value = KVPair.Split("="c)(1)
+	'			Key = KVPair.Split("="c)(0)
+	'			Value = KVPair.Split("="c)(1)
 
-				Configuration(Key) = Value
-			Next
+	'			Configuration(Key) = Value
+	'		Next
 
-		Catch ex As Exception
-		End Try
+	'	Catch ex As Exception
+	'	End Try
 
 
-		Return Configuration
-	End Function
+	'	Return Configuration
+	'End Function
 
 
 End Module

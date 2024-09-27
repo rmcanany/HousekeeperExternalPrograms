@@ -13,9 +13,9 @@ Public Class Converter
         Dim SEDoc As Object = Nothing
         Dim Sheets As Object
 
-        Dim Configuration As New Dictionary(Of String, String)
+        'Dim Configuration As New Dictionary(Of String, String)
 
-        Configuration = GetConfiguration(StartupPath)
+        'Configuration = GetConfiguration(StartupPath)
 
         Try
             SEApp = Runtime.InteropServices.Marshal.GetActiveObject("SolidEdge.Application")
@@ -102,45 +102,45 @@ Public Class Converter
     End Sub
 
 
-    Private Shared Function GetConfiguration(StartupPath As String) As Dictionary(Of String, String)
-        Dim Configuration As New Dictionary(Of String, String)
-        Dim Defaults As String() = Nothing
-        Dim Key As String
-        Dim Value As String = ""
-        Dim DefaultsFilename As String
-        Dim KVPairArray As Array
-        Dim i As Integer
+'    Private Shared Function GetConfiguration(StartupPath As String) As Dictionary(Of String, String)
+'        Dim Configuration As New Dictionary(Of String, String)
+'        Dim Defaults As String() = Nothing
+'        Dim Key As String
+'        Dim Value As String = ""
+'        Dim DefaultsFilename As String
+'        Dim KVPairArray As Array
+'        Dim i As Integer
 
-        DefaultsFilename = String.Format("{0}\defaults.txt", StartupPath)
+'        DefaultsFilename = String.Format("{0}\defaults.txt", StartupPath)
 
-        Try
-            Defaults = IO.File.ReadAllLines(DefaultsFilename)
+'        Try
+'            Defaults = IO.File.ReadAllLines(DefaultsFilename)
 
-            For Each KVPair As String In Defaults
-                If Not KVPair.Contains("=") Then
-                    Continue For
-                End If
+'            For Each KVPair As String In Defaults
+'                If Not KVPair.Contains("=") Then
+'                    Continue For
+'                End If
 
-                KVPairArray = KVPair.Split("=")
-                Key = KVPairArray(0)
+'                KVPairArray = KVPair.Split("=")
+'                Key = KVPairArray(0)
 
-                For i = 1 To KVPairArray.Length - 1
-                    If i = 1 Then
-                        Value = KVPairArray(i)
-                    Else
-                        Value = String.Format("{}={}", Value, KVPairArray(i))
-                    End If
-                Next
+'                For i = 1 To KVPairArray.Length - 1
+'                    If i = 1 Then
+'                        Value = KVPairArray(i)
+'                    Else
+'                        Value = String.Format("{}={}", Value, KVPairArray(i))
+'                    End If
+'                Next
 
-                Configuration(Key) = Value
-            Next
+'                Configuration(Key) = Value
+'            Next
 
-        Catch ex As Exception
-        End Try
+'        Catch ex As Exception
+'        End Try
 
 
-        Return Configuration
-    End Function
+'        Return Configuration
+'    End Function
 
 End Class
 "@
