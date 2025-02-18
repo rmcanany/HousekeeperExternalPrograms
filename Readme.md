@@ -1,7 +1,7 @@
 ![Logo](logo.png)
 
 # Solid Edge Housekeeper External Programs
-2024 Robert McAnany
+2025 Robert McAnany
 
 Description and examples for Solid Edge Housekeeper's `Run External Program` task.
 
@@ -45,27 +45,30 @@ No assumptions are made about what the external program does. If you change a fi
 
 Sample programs may be the easiest way to get started automating Solid Edge yourself. Here are a few sites to check out:
 
-Jason Newell [**SolidEdgeCommunity**](https://github.com/SolidEdgeCommunity)
+Jason Newell: [**SolidEdgeCommunity**](https://github.com/SolidEdgeCommunity)
 
-Tushar Suradkar [**SurfAndCode**](http://www.surfandcode.in/2014/01/index-of-all-tutorials-on-this-solid.html)
+Tushar Suradkar: [**SurfAndCode**](http://www.surfandcode.in/2014/01/index-of-all-tutorials-on-this-solid.html)
 
-Jason Titcomb [**LMGiJason**](https://github.com/LMGiJason)
+Jason Titcomb: [**LMGiJason**](https://github.com/LMGiJason)
 
-Wolfgang Hackl [**Cadcam-Consult**](http://cadcam-consult.com/Page_00/index.html)
+Wolfgang Hackl: [**Cadcam-Consult**](http://cadcam-consult.com/Page_00/index.html)
 
-Kabir Costa [**KabirCosta**](https://github.com/kabircosta)
+Kabir Costa: [**KabirCosta**](https://github.com/kabircosta)
 
-Alan Pope [**Cadcentral NZ**](https://www.cadcentral.co.nz/macros)
+Alan Pope: [**Cadcentral NZ**](https://www.cadcentral.co.nz/macros)
 
-UK Dave [**uk-dave**](https://github.com/uk-dave/SolidEdge)
+UK Dave: [**uk-dave**](https://github.com/uk-dave/SolidEdge)
 
-Francesco Arfilli [**farfilli**](https://github.com/farfilli)
+Francesco Arfilli: [**farfilli**](https://github.com/farfilli)
 
-Chris Clems [**ChrisClems**](https://github.com/ChrisClems)
+Chris Clems: [**ChrisClems**](https://github.com/ChrisClems)
 
-NosyBottle [**NosyBottle**](https://github.com/Nosybottle)
+Derek Gooding: [**DerekGooding**](https://github.com/DerekGooding)
 
-ZaPpInG [**lrmoreno007**](https://github.com/lrmoreno007)
+NosyBottle: [**NosyBottle**](https://github.com/Nosybottle)
+
+ZaPpInG: [**lrmoreno007**](https://github.com/lrmoreno007)
+
 
 To suggest other sources, including your own, feel free to message me, RobertMcAnany, on the [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge).
 
