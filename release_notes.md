@@ -3,6 +3,10 @@
 Companion repo with instructions and program examples for the 
 Solid Edge Housekeeper `Run external program` task.
 
+## V2025.1
+
+Updated error handling and configuration input.
+
 ## V2024.0
 
 Added example programs `CompareFlatAndModelVolumes`, `QtyFromAssy`.
