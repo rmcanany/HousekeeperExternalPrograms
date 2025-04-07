@@ -1,0 +1,6 @@
+SEApp.Activate()
+SEApp.DoIdle()
+
+My.Computer.Keyboard.SendKeys("^t", True)
+'My.Computer.Keyboard.SendKeys("+v", True)
+SEApp.DoIdle()

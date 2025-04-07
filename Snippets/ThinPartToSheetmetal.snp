@@ -1,0 +1,61 @@
+Dim Models = SEDoc.Models
+
+If Models.Count = 0 Then
+    ExitStatus = 1
+    ErrorMessageList.Add("No models detected.")
+End If
+
+If Models.Count > 1 Then
+    ExitStatus = 1
+    ErrorMessageList.Add("Cannot process files with multiple models.")
+End If
+
+If Models.Count = 1 Then
+    Dim ConvToSMs = Models.Item(1).ConvToSMs
+
+    If ConvToSMs.Count > 0 Then
+        ExitStatus = 1
+        ErrorMessageList.Add("Thin part already converted to sheetmetal.")
+    Else
+        Dim Body = Models.Item(1).Body
+        Dim igQueryPlane = 6
+        Dim Faces = Body.Faces(FaceType:=igQueryPlane)
+        Dim Face As Object = Nothing
+
+        Dim MaxArea As Double = 0
+        For i As Integer = 1 To Faces.Count
+            If Faces(i).Area > MaxArea Then
+                MaxArea = Faces(i).Area
+                Face = Faces(i)
+            End If
+        Next i
+
+        If Face IsNot Nothing Then
+            Try
+                Dim ConvToSM = ConvToSMs.AddEx(Face)
+                SEApp.DoIdle()
+
+                If ConvToSM IsNot Nothing Then
+                    Dim Status = ConvToSM.Status
+                    Dim StatusOK as Integer = 1216476310
+                    If Not Status = StatusOK Then
+                        ExitStatus = 1
+                        ErrorMessageList.Add("Possible error in conversion.  Please verify results.")
+                    Else
+                        SEDoc.Save()
+                        SEApp.DoIdle()
+                    End If
+                Else
+                    ExitStatus = 1
+                    ErrorMessageList.Add("Unable to convert to sheetmetal")
+                End If
+
+            Catch ex As Exception
+                ExitStatus = 1
+                ErrorMessageList.Add("Unable to convert to sheetmetal")
+            End Try
+                
+        End If
+    End If
+                
+End If

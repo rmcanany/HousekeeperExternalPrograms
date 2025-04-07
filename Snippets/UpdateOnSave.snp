@@ -1,0 +1,9 @@
+If DocType = ".asm" Then SEDoc.PhysicalProperties.UpdateOnFileSaveStatus = True
+If DocType = ".par" Then SEDoc.UpdateOnFileSave = True
+If DocType = ".psm" Then SEDoc.UpdateOnFileSave = True
+If ExitStatus = 0 Then
+    SEDoc.Save()
+    SEApp.DoIdle()
+Else
+    ErrorMessageList.Add("An error occurred")
+End If

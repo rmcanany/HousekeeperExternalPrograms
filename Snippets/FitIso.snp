@@ -1,0 +1,4 @@
+SEApp.StartCommand(32810)
+SEApp.DoIdle()
+SEDoc.Save()
+SEApp.DoIdle()
