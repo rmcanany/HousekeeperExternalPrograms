@@ -7,6 +7,8 @@ Description and examples for Solid Edge Housekeeper's `Run External Program` tas
 
 The external program is a Console App that works on a single Solid Edge file.  Housekeeper serves up files one at a time for processing.  
 
+Most developers will want the source code, however compiled versions are available [<ins>**here**</ins>](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/).
+
 ## Requirements
 
 To work with Housekeeper's error reporting, the program should return an integer exit code, with `0` meaning success.  Anything else indicates an error.  If an exit code is not issued, Housekeeper assumes success.
@@ -39,7 +41,7 @@ No arguments are passed to the program. If you need to get a value from Housekee
 
 Housekeeper maintains a `reference` to the file being processed. If that reference is broken, an exception will occur. To avoid that, do not perform `Close()` or `SaveAs()` (`SaveCopyAs()` is OK) on the document.
 
-No assumptions are made about what the external program does. If you change a file and want to save it, that needs to be in the program.  If you open another file, you need to close it. One exception is that Housekeeper has a global option to save the file after processing.  It is set on the Configuration tab.
+No assumptions are made about what the external program does. If you change a file and want to save it, that needs to be in the program.  If you open another file, you need to close it. 
 
 ## Other repos and sources for macros
 
@@ -74,10 +76,6 @@ To suggest other sources, including your own, feel free to message me, RobertMcA
 
 If you're looking for someone to create a program *for* you, I know a couple of folks who do it for a living.  Message me on the Forum and I'll pass along the request.
 
-
-## Releases
-
-Most developers will want the source code, however compiled versions are available [**here**](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/).
 
 
 
