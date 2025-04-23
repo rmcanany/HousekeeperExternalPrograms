@@ -1,0 +1,5 @@
+SEApp.WindowState = 0
+SEApp.DoIdle()
+SEApp.Height = 410
+SEApp.Width = 600
+SEApp.DoIdle()
