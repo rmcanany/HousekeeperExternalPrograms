@@ -4,7 +4,7 @@ Example program for the Solid Edge Housekeeper `Run External Program` command.
 
 Creates a flat pattern of a formed sheet metal part.  Processes `Ordered` and `Sync` parts.  Processes `*.psm` and `*.par` parts as long as the `SheetMetal` environment is active.
 
-Selects the largest planar face and the longest linear edge of that face for creation and placement.
+Selects the largest planar face, and its longest linear edge, for creation and placement.
 
 The user is alerted through Housekeeper's reporting mechanism if:
 - The file's active environment is not `SheetMetal`

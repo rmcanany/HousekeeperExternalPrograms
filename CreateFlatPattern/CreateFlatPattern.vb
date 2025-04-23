@@ -42,18 +42,18 @@ Module CreateFlatPattern
 				ErrorMessageList.Add(String.Format("File active environment was '{0}', not 'SheetMetal'", ActiveEnvironment))
 			End If
 
-			Select Case IO.Path.GetExtension(SEDoc.FullName)
-				Case ".psm"
+			Select Case GetDocType(SEDoc)
+				Case "psm"
 					Dim tmpSEDoc As SolidEdgePart.SheetMetalDocument = CType(SEDoc, SolidEdgePart.SheetMetalDocument)
 					Models = tmpSEDoc.Models
 					FlatPatternModels = tmpSEDoc.FlatPatternModels
-				Case ".par"
+				Case "par"
 					Dim tmpSEDoc As SolidEdgePart.PartDocument = CType(SEDoc, SolidEdgePart.PartDocument)
 					Models = tmpSEDoc.Models
 					FlatPatternModels = tmpSEDoc.FlatPatternModels
 				Case Else
 					ExitStatus = 1
-					ErrorMessageList.Add(String.Format("Unrecognized file type '{0}'", IO.Path.GetExtension(SEDoc.FullName)))
+					ErrorMessageList.Add(String.Format("Unrecognized file type '{0}'", GetDocType(SEDoc)))
 			End Select
 		End If
 
@@ -67,7 +67,7 @@ Module CreateFlatPattern
 			Dim Faces As SolidEdgeGeometry.Faces = Nothing
 			Dim Face As SolidEdgeGeometry.Face
 			Dim LargestFace As SolidEdgeGeometry.Face = Nothing
-			Dim Edges As SolidEdgeGeometry.Edges = Nothing
+			'Dim Edges As SolidEdgeGeometry.Edges = Nothing
 			Dim LongestLinearEdge As SolidEdgeGeometry.Edge = Nothing
 			Dim MaxArea As Double
 
@@ -94,9 +94,6 @@ Module CreateFlatPattern
 			End If
 
 			If ExitStatus = 0 Then
-				'For Each Model In Models
-				'	If Model IsNot Nothing Then Exit For
-				'Next
 				Model = Models.Item(1)
 
 				Try
@@ -124,9 +121,7 @@ Module CreateFlatPattern
 						End If
 					Next
 
-					Edges = CType(LargestFace.Edges, SolidEdgeGeometry.Edges)
-
-					LongestLinearEdge = GetLongestLinearEdge(Edges)
+					LongestLinearEdge = GetLongestLinearEdge(LargestFace)
 
 				Catch ex As Exception
 					ExitStatus = 1
@@ -144,7 +139,7 @@ Module CreateFlatPattern
 				Try
 					FlatPatternModel = FlatPatternModels.Add(Model)
 					FlatPatterns = FlatPatternModel.FlatPatterns
-					'FlatPattern = FlatPatterns.Add(Edge)
+					'FlatPattern = FlatPatterns.Add(Edge)  ' Needs a face to get the flatpattern oriented to the top view
 					FlatPattern = FlatPatterns.Add(LongestLinearEdge, LargestFace, LargestFace)
 				Catch ex As Exception
 					ExitStatus = 1
@@ -180,9 +175,11 @@ Module CreateFlatPattern
 		Return ExitStatus
 	End Function
 
-	Private Function GetLongestLinearEdge(Edges As SolidEdgeGeometry.Edges) As SolidEdgeGeometry.Edge
+	Private Function GetLongestLinearEdge(LargestFace As SolidEdgeGeometry.Face) As SolidEdgeGeometry.Edge
 
 		Dim LongestEdge As SolidEdgeGeometry.Edge = Nothing
+
+		Dim Edges As SolidEdgeGeometry.Edges = CType(LargestFace.Edges, SolidEdgeGeometry.Edges)
 
 		Dim Edge As SolidEdgeGeometry.Edge
 		Dim minParam As Double
@@ -209,7 +206,43 @@ Module CreateFlatPattern
 	End Function
 
 
+	Public Function GetDocType(SEDoc As SolidEdgeFramework.SolidEdgeDocument) As String
+		' See SolidEdgeFramework.DocumentTypeConstants
+
+		' If the type is not recognized, the empty string is returned.
+		Dim DocType As String = ""
+
+		If Not IsNothing(SEDoc) Then
+			Select Case SEDoc.Type
+
+				Case SolidEdgeFramework.DocumentTypeConstants.igAssemblyDocument
+					DocType = "asm"
+				Case SolidEdgeFramework.DocumentTypeConstants.igWeldmentAssemblyDocument
+					DocType = "asm"
+				Case SolidEdgeFramework.DocumentTypeConstants.igSyncAssemblyDocument
+					DocType = "asm"
+				Case SolidEdgeFramework.DocumentTypeConstants.igPartDocument
+					DocType = "par"
+				Case SolidEdgeFramework.DocumentTypeConstants.igSyncPartDocument
+					DocType = "par"
+				Case SolidEdgeFramework.DocumentTypeConstants.igSheetMetalDocument
+					DocType = "psm"
+				Case SolidEdgeFramework.DocumentTypeConstants.igSyncSheetMetalDocument
+					DocType = "psm"
+				Case SolidEdgeFramework.DocumentTypeConstants.igDraftDocument
+					DocType = "dft"
+
+				Case Else
+					MsgBox(String.Format("DocType '{0}' not recognized", SEDoc.Type.ToString))
+			End Select
+		End If
+
+		Return DocType
+	End Function
+
 	Private Sub SaveErrorMessages(ErrorMessageList As List(Of String))
+		' Saves error_messages.txt to the directory of the external program
+
 		Dim ErrorFilename As String
 		Dim StartupPath As String = System.AppDomain.CurrentDomain.BaseDirectory
 

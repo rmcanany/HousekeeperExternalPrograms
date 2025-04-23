@@ -3,6 +3,10 @@
 Companion repo with instructions and program examples for the 
 Solid Edge Housekeeper `Run external program` task.
 
+## V2025.2
+
+Added `Snippets`, `ThinPartToSheetmetal` and `CreateFlatPattern`.
+
 ## V2025.1
 
 Updated error handling and configuration input.
