@@ -163,7 +163,7 @@ Module Module1
                 ' TemplateName = C:\Program Files\Siemens\Solid Edge 2024\Template\ANSI Inch\A_sheet.dft
                 ' ReplaceBlock = Old name A, New name A
 
-                Key = s.Split("="c)(0).Trim     ' 'ReplaceBlock = Old name A, New name A' -> 'ReplaceBlock'
+                Key = s.Split("="c)(0).Trim                                  ' 'ReplaceBlock = Old name A, New name A' -> 'ReplaceBlock'
 
                 If Key.ToLower = "templatename" Then
                     Value = s.Split("="c)(1).Trim
@@ -172,10 +172,10 @@ Module Module1
                 ElseIf Key.ToLower.Contains("replaceblock") Then
                     Count += 1
 
-                    Key = String.Format("{0}{1}", Key, CStr(Count))  '  'ReplaceBlock' -> 'ReplaceBlock1'
+                    Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'ReplaceBlock' -> 'ReplaceBlock1'
 
-                    Value = s.Split("="c)(1).Trim     ' 'ReplaceBlock = Old name A, New name A' -> 'Old name A, New name A'
-                    Dim FileBlockName = Value.Split(CChar(","))(0).Trim  ' 'Old name A, New name A' -> 'Old name A'
+                    Value = s.Split("="c)(1).Trim                            ' 'ReplaceBlock = Old name A, New name A' -> 'Old name A, New name A'
+                    Dim FileBlockName = Value.Split(CChar(","))(0).Trim      ' 'Old name A, New name A' -> 'Old name A'
                     Dim TemplateBlockName = Value.Split(CChar(","))(1).Trim  ' 'Old name A, New name A' -> 'New name A'
 
                     ProgramSettings(Key) = {FileBlockName, TemplateBlockName}.ToList

@@ -18,4 +18,4 @@ There are a couple of limitations in the current implementation.
 
 First, it cannot replace a differently-named block if a block with the new name already exists in the file.  That situation is reported in the log file.
 
-Second, it will have trouble with any block name that contains a comma.
+Second, it will have trouble with any block name that contains a comma.  That is also reported in the log file.
