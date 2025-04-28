@@ -7,7 +7,7 @@ Description and examples for Solid Edge Housekeeper's `Run External Program` tas
 
 The external program is a Console App that works on a single Solid Edge file.  Housekeeper serves up files one at a time for processing.  
 
-Most developers will want the source code, however compiled versions are available [<ins>**here**</ins>](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/).
+Most developers will want the source code, however compiled versions are available as [<ins>**Releases**</ins>](https://github.com/rmcanany/HousekeeperExternalPrograms/releases/).
 
 ## Requirements
 
