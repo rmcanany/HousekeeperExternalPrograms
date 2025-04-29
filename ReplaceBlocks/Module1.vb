@@ -149,8 +149,6 @@ Module Module1
             Next
         End If
 
-
-
         If TemplateDoc IsNot Nothing Then
             TemplateDoc.Close(False)
             SEApp.DoIdle()

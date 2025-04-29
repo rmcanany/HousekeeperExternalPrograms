@@ -9,10 +9,17 @@ TemplateName = C:\data\CAD\BlockLibrary.dft
 
 ReplaceBlock = Block1, Block1
 ReplaceBlock = TitleBlock, NewTitleBlock
+
+AddBlock = square
+AddBlock = circle
+
+DeleteBlock = slot
+DeleteBlock = triangle
 ```
 
 - The `TemplateName` variable tells the program what file contains the replacement blocks.
 - The `ReplaceBlock` variable is a comma-delimited tuple.  The first entry is the name of the block to be replaced.  The second is the name of its replacement.  There can be any number `ReplaceBlock` entries in the file.
+- The `AddBlock` and `DeleteBlock` variables define what blocks are to be processed for the respective action.  There can be any number of these, as well.
  
 There are a couple of limitations in the current implementation.  
 
