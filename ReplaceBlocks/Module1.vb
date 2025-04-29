@@ -32,6 +32,8 @@ Module Module1
         Dim TemplateDoc As SolidEdgeDraft.DraftDocument = Nothing
         Dim DocBlocksDict As New Dictionary(Of String, SolidEdgeDraft.Block)
         Dim TemplateBlocksDict As New Dictionary(Of String, SolidEdgeDraft.Block)
+        Dim AddBlocksList As New List(Of String)
+        Dim DeleteBlocksList As New List(Of String)
         Dim ProgramSettings As Dictionary(Of String, List(Of String))
 
         ' Program settings
@@ -45,6 +47,10 @@ Module Module1
                         FileBlockName = ProgramSettings(Key)(0)
                         TemplateBlockName = ProgramSettings(Key)(1)
                         ReplacementsDict(FileBlockName) = TemplateBlockName
+                    ElseIf Key.ToLower.Contains("addblock") Then
+                        AddBlocksList.Add(ProgramSettings(Key)(0))
+                    ElseIf Key.ToLower.Contains("deleteblock") Then
+                        DeleteBlocksList.Add(ProgramSettings(Key)(0))
                     End If
                 Next
             Else
@@ -68,9 +74,8 @@ Module Module1
             End If
         End If
 
-        ' Find and replace
+        ' Read blocks from both files
         If ExitStatus = 0 Then
-
             ' Read all blocks in both the file and template
             ' Populate two dicts such that Dict(BlockName) = Block Object
             For Each DocBlock As SolidEdgeDraft.Block In SEDoc.Blocks
@@ -80,7 +85,11 @@ Module Module1
                 TemplateBlocksDict(TemplateBlock.Name) = TemplateBlock
             Next
 
-            ' Do the replacements
+        End If
+
+        ' Find and replace
+        If ExitStatus = 0 And ReplacementsDict.Keys.Count > 0 Then
+
             For Each DocBlockName As String In ReplacementsDict.Keys
                 TemplateBlockName = ReplacementsDict(DocBlockName)
                 If DocBlocksDict.Keys.Contains(DocBlockName) Then
@@ -107,10 +116,47 @@ Module Module1
             Next
         End If
 
-        If TemplateDoc IsNot Nothing Then TemplateDoc.Close(False)
-        SEApp.DoIdle()
+        ' Add
+        If ExitStatus = 0 And AddBlocksList.Count > 0 Then
+            For Each BlockName In AddBlocksList
+                If Not DocBlocksDict.Keys.Contains(BlockName) Then
+                    If TemplateBlocksDict.Keys.Contains(BlockName) Then
+                        SEDoc.Blocks.CopyBlock(TemplateBlocksDict(BlockName))
+                    Else
+                        ExitStatus = 1
+                        ErrorMessageList.Add(String.Format("Template does not have a block named '{0}'", BlockName))
+                    End If
+                Else
+                    ExitStatus = 1
+                    ErrorMessageList.Add(String.Format("File already has a block named '{0}'", BlockName))
+                End If
+            Next
+        End If
 
-        If SEDoc.ReadOnly Then
+        ' Delete
+        If ExitStatus = 0 And DeleteBlocksList.Count > 0 Then
+            For Each BlockName In DeleteBlocksList
+                If DocBlocksDict.Keys.Contains(BlockName) Then
+                    Try
+                        DocBlocksDict(BlockName).Delete()
+                    Catch ex As Exception
+                        ExitStatus = 1
+                        ErrorMessageList.Add(String.Format("Unable to delete block '{0}'", BlockName))
+                    End Try
+                Else
+                    ' Not an error
+                End If
+            Next
+        End If
+
+
+
+        If TemplateDoc IsNot Nothing Then
+            TemplateDoc.Close(False)
+            SEApp.DoIdle()
+        End If
+
+        If SEDoc IsNot Nothing AndAlso SEDoc.ReadOnly Then
             ExitStatus = 1
             ErrorMessageList.Add("Cannot save read-only document")
         End If
@@ -154,32 +200,66 @@ Module Module1
 
                 If tf Then Continue For
 
-                tf = s.ToLower.Contains("replaceblock")
+                tf = s.Split("="c)(0).ToLower.Contains("replaceblock")
                 tf = tf And Not s.Split(CChar(",")).Count = 2
 
                 If tf Then Throw New Exception(String.Format("Could not parse '{0}'", s))
 
                 ' Expected format example
+                ' Just one template
                 ' TemplateName = C:\Program Files\Siemens\Solid Edge 2024\Template\ANSI Inch\A_sheet.dft
+                ' Any number of these
                 ' ReplaceBlock = Old name A, New name A
+                ' AddBlock = Block2
+                ' DeleteBlock = Block3
 
                 Key = s.Split("="c)(0).Trim                                  ' 'ReplaceBlock = Old name A, New name A' -> 'ReplaceBlock'
 
-                If Key.ToLower = "templatename" Then
-                    Value = s.Split("="c)(1).Trim
-                    ProgramSettings(Key) = {Value}.ToList
+                Select Case Key.ToLower
+                    Case "templatename"
+                        Value = s.Split("="c)(1).Trim
+                        ProgramSettings(Key) = {Value}.ToList
 
-                ElseIf Key.ToLower.Contains("replaceblock") Then
-                    Count += 1
+                    Case "replaceblock"
+                        Count += 1
+                        Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'ReplaceBlock' -> 'ReplaceBlock1'
 
-                    Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'ReplaceBlock' -> 'ReplaceBlock1'
+                        Value = s.Split("="c)(1).Trim                            ' 'ReplaceBlock = Old name A, New name A' -> 'Old name A, New name A'
+                        Dim FileBlockName = Value.Split(CChar(","))(0).Trim      ' 'Old name A, New name A' -> 'Old name A'
+                        Dim TemplateBlockName = Value.Split(CChar(","))(1).Trim  ' 'Old name A, New name A' -> 'New name A'
 
-                    Value = s.Split("="c)(1).Trim                            ' 'ReplaceBlock = Old name A, New name A' -> 'Old name A, New name A'
-                    Dim FileBlockName = Value.Split(CChar(","))(0).Trim      ' 'Old name A, New name A' -> 'Old name A'
-                    Dim TemplateBlockName = Value.Split(CChar(","))(1).Trim  ' 'Old name A, New name A' -> 'New name A'
+                        ProgramSettings(Key) = {FileBlockName, TemplateBlockName}.ToList
 
-                    ProgramSettings(Key) = {FileBlockName, TemplateBlockName}.ToList
-                End If
+                    Case "addblock"
+                        Count += 1
+                        Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'AddBlock' -> 'AddBlock1'
+                        Value = s.Split("="c)(1).Trim
+                        ProgramSettings(Key) = {Value}.ToList
+
+                    Case "deleteblock"
+                        Count += 1
+                        Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'DeleteBlock' -> 'DeleteBlock1'
+                        Value = s.Split("="c)(1).Trim
+                        ProgramSettings(Key) = {Value}.ToList
+
+
+                End Select
+
+                'If Key.ToLower = "templatename" Then
+                '    Value = s.Split("="c)(1).Trim
+                '    ProgramSettings(Key) = {Value}.ToList
+
+                'ElseIf Key.ToLower.Contains("replaceblock") Then
+                '    Count += 1
+
+                '    Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'ReplaceBlock' -> 'ReplaceBlock1'
+
+                '    Value = s.Split("="c)(1).Trim                            ' 'ReplaceBlock = Old name A, New name A' -> 'Old name A, New name A'
+                '    Dim FileBlockName = Value.Split(CChar(","))(0).Trim      ' 'Old name A, New name A' -> 'Old name A'
+                '    Dim TemplateBlockName = Value.Split(CChar(","))(1).Trim  ' 'Old name A, New name A' -> 'New name A'
+
+                '    ProgramSettings(Key) = {FileBlockName, TemplateBlockName}.ToList
+                'End If
 
             Next
 
@@ -188,25 +268,25 @@ Module Module1
             Return Nothing
         End Try
 
-        Dim s1 As String = ""
-        For Each s As String In RequiredKeys
-            Dim GotAMatch As Boolean = False
-            For Each Key In ProgramSettings.Keys
-                If Key.Contains(s) Then
-                    GotAMatch = True
-                    Exit For
-                End If
-            Next
-            If Not GotAMatch Then
-                s1 = String.Format("    {0}{1}{2}", s1, s, vbCrLf)
-            End If
-        Next
+        'Dim s1 As String = ""
+        'For Each s As String In RequiredKeys
+        '    Dim GotAMatch As Boolean = False
+        '    For Each Key In ProgramSettings.Keys
+        '        If Key.Contains(s) Then
+        '            GotAMatch = True
+        '            Exit For
+        '        End If
+        '    Next
+        '    If Not GotAMatch Then
+        '        s1 = String.Format("    {0}{1}{2}", s1, s, vbCrLf)
+        '    End If
+        'Next
 
-        If Not s1 = "" Then
-            s1 = String.Format("The following variable names not found in program_settings.txt{0}{1}", vbCrLf, s1)
-            MsgBox(s1, vbOKOnly)
-            Return Nothing
-        End If
+        'If Not s1 = "" Then
+        '    s1 = String.Format("The following variable names not found in program_settings.txt{0}{1}", vbCrLf, s1)
+        '    MsgBox(s1, vbOKOnly)
+        '    Return Nothing
+        'End If
 
         Return ProgramSettings
 
