@@ -243,22 +243,6 @@ Module Module1
 
                 End Select
 
-                'If Key.ToLower = "templatename" Then
-                '    Value = s.Split("="c)(1).Trim
-                '    ProgramSettings(Key) = {Value}.ToList
-
-                'ElseIf Key.ToLower.Contains("replaceblock") Then
-                '    Count += 1
-
-                '    Key = String.Format("{0}{1}", Key, CStr(Count))          ' 'ReplaceBlock' -> 'ReplaceBlock1'
-
-                '    Value = s.Split("="c)(1).Trim                            ' 'ReplaceBlock = Old name A, New name A' -> 'Old name A, New name A'
-                '    Dim FileBlockName = Value.Split(CChar(","))(0).Trim      ' 'Old name A, New name A' -> 'Old name A'
-                '    Dim TemplateBlockName = Value.Split(CChar(","))(1).Trim  ' 'Old name A, New name A' -> 'New name A'
-
-                '    ProgramSettings(Key) = {FileBlockName, TemplateBlockName}.ToList
-                'End If
-
             Next
 
         Catch ex As Exception
@@ -266,25 +250,36 @@ Module Module1
             Return Nothing
         End Try
 
-        'Dim s1 As String = ""
-        'For Each s As String In RequiredKeys
-        '    Dim GotAMatch As Boolean = False
-        '    For Each Key In ProgramSettings.Keys
-        '        If Key.Contains(s) Then
-        '            GotAMatch = True
-        '            Exit For
-        '        End If
-        '    Next
-        '    If Not GotAMatch Then
-        '        s1 = String.Format("    {0}{1}{2}", s1, s, vbCrLf)
-        '    End If
-        'Next
+        Dim GotATemplate As Boolean = False
+        Dim GotAnAction As Boolean = False
 
-        'If Not s1 = "" Then
-        '    s1 = String.Format("The following variable names not found in program_settings.txt{0}{1}", vbCrLf, s1)
-        '    MsgBox(s1, vbOKOnly)
-        '    Return Nothing
-        'End If
+        For Each Key In ProgramSettings.Keys
+            If Key.ToLower.Contains("templatename") Then
+                GotATemplate = True
+            ElseIf Key.ToLower.Contains("replaceblock") Then
+                GotAnAction = True
+            ElseIf Key.ToLower.Contains("addblock") Then
+                GotAnAction = True
+            ElseIf Key.ToLower.Contains("deleteblock") Then
+                GotAnAction = True
+            End If
+            If GotATemplate And GotAnAction Then Exit For
+        Next
+
+        Dim s1 As String = ""
+
+        If Not GotATemplate Then
+            s1 = "No template variable specified.  "
+        End If
+
+        If Not GotAnAction Then
+            s1 = String.Format("{0}No action variable specified.", s1)
+        End If
+
+        If Not s1 = "" Then
+            MsgBox(s1, vbOKOnly)
+            Return Nothing
+        End If
 
         Return ProgramSettings
 
