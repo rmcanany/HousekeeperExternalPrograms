@@ -1,0 +1,62 @@
+If DocType = ".dft" Then
+
+    Dim PartsListNames as New List(Of String)
+    Dim PartsLists as New List(Of Object)
+    Dim BackgroundNames as New List(Of String)
+
+    Try
+        For Each PartsList As Object in SEDoc.PartsLists
+            PartsListNames.Add(PartsList.Name)
+        Next
+    Catch
+        ExitStatus = 1
+        ErrorMessageList.Add("Could not process parts lists")
+    End Try
+
+    Try
+        If ExitStatus = 0 And PartsListNames.Count > 0 Then
+            For Each Sheet As Object in SEDoc.Sheets
+                If Sheet.Section.Type = 0 Then
+                    For Each Item as Object in Sheet.DrawingObjects
+                        ' Not all DrawingObjects have names
+                        Try
+                            If PartsListNames.Contains(Item.Name) Then
+                                PartsLists.add(Item)
+                                BackgroundNames.Add(Sheet.Background.Name)
+                            End If
+                        Catch ex as Exception
+                        End Try
+                    Next
+                End If
+            Next
+        End If
+    Catch
+        ExitStatus = 1
+        ErrorMessageList.Add("Could not process sheets")
+    End Try
+
+    If ExitStatus = 0 And PartsLists.Count > 0 And PartsLists.Count = BackgroundNames.Count Then
+        For i As Integer = 0 To PartsLists.Count - 1
+            Try
+                PartsLists(i).SavedSettings = BackgroundNames(i) + " NEW"
+                PartsLists(i).Update()
+                SEApp.DoIdle()
+            Catch ex as Exception
+                ExitStatus = 1
+                Dim s as String
+                s = String.Format("Could not update parts list to '{0} NEW'", BackgroundNames(i))
+                ErrorMessageList.Add(s)
+            End Try
+        Next
+    End If
+
+    If ExitStatus = 0 Then
+        Try
+            SEDoc.Save()
+            SEApp.DoIdle()
+        Catch
+            ExitStatus = 1
+            ErrorMessageList.Add("Could not save file")
+        End Try
+    End If
+End If
