@@ -1,31 +1,20 @@
 If DocType = ".dft" Then
 
-    Dim PartsListNames as New List(Of String)
-    Dim PartsLists as New List(Of Object)
-    Dim BackgroundNames as New List(Of String)
+    Dim tmpSEDoc As SolidEdgeDraft.DraftDocument = CType(SEDoc, SolidEdgeDraft.DraftDocument)
+
+    Dim PartsLists As New List(Of SolidEdgeDraft.PartsList)
+    Dim BackgroundNames As New List(Of String)
 
     Try
-        For Each PartsList As Object in SEDoc.PartsLists
-            PartsListNames.Add(PartsList.Name)
-        Next
-    Catch
-        ExitStatus = 1
-        ErrorMessageList.Add("Could not process parts lists")
-    End Try
-
-    Try
-        If ExitStatus = 0 And PartsListNames.Count > 0 Then
-            For Each Sheet As Object in SEDoc.Sheets
+        If ExitStatus = 0 Then
+            For Each Sheet As SolidEdgeDraft.Sheet In tmpSEDoc.Sheets
                 If Sheet.Section.Type = 0 Then
-                    For Each Item as Object in Sheet.DrawingObjects
-                        ' Not all DrawingObjects have names
-                        Try
-                            If PartsListNames.Contains(Item.Name) Then
-                                PartsLists.add(Item)
-                                BackgroundNames.Add(Sheet.Background.Name)
-                            End If
-                        Catch ex as Exception
-                        End Try
+                    For Each Item As Object In Sheet.DrawingObjects
+                        Dim PartsList As SolidEdgeDraft.PartsList = TryCast(Item, SolidEdgeDraft.PartsList)
+                        If PartsList IsNot Nothing Then
+                            PartsLists.Add(PartsList)
+                            BackgroundNames.Add(Sheet.Background.Name)
+                        End If
                     Next
                 End If
             Next
@@ -41,9 +30,10 @@ If DocType = ".dft" Then
                 PartsLists(i).SavedSettings = BackgroundNames(i) + " NEW"
                 PartsLists(i).Update()
                 SEApp.DoIdle()
-            Catch ex as Exception
+            Catch ex As Exception
                 ExitStatus = 1
-                Dim s as String
+                'ErrorMessageList.Add($"Could not update parts list to '{BackgroundNames(i)} NEW'")
+                Dim s As String
                 s = String.Format("Could not update parts list to '{0} NEW'", BackgroundNames(i))
                 ErrorMessageList.Add(s)
             End Try
