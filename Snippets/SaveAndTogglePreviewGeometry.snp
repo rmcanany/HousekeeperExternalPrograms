@@ -1,0 +1,35 @@
+' Contributed by @ih0nza (github)
+
+If DocType = ".asm" Then
+    Dim PreviewParam As SolidEdgeFramework.ApplicationGlobalConstants
+    PreviewParam = SolidEdgeFramework.ApplicationGlobalConstants.seApplicationGlobalStoreGeometryInAssemblyForPreview
+
+    Try
+        ' Krok 1 Vypnutí a uložení
+        SEApp.SetGlobalParameter(PreviewParam, False)
+        SEDoc.Save()
+        SEApp.DoIdle()
+    Catch ex As Exception
+        ExitStatus = 1
+        ErrorMessageList.Add(String.Format("An error occurred disabling preview mode: {0}", ex.Message))
+    End Try
+
+    Try
+        ' Krok 2 Zapnutí a uložení
+        SEApp.SetGlobalParameter(PreviewParam, True)
+        SEDoc.Save()
+        SEApp.DoIdle()
+    Catch ex As Exception
+        ExitStatus = 1
+        ErrorMessageList.Add(String.Format("An error occurred enabling preview mode: {0}", ex.Message))
+    End Try
+
+Else
+    Try
+        SEDoc.Save()
+        SEApp.DoIdle()
+    Catch ex As Exception
+        ExitStatus = 1
+        ErrorMessageList.Add(String.Format("An error occurred saving the file: {0}", ex.Message))
+    End Try
+End If
