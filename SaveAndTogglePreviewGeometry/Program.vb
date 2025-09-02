@@ -1,10 +1,4 @@
-'Imports System
-
-'Module Program
-'    Sub Main(args As String())
-'        Console.WriteLine("Hello World!")
-'    End Sub
-'End Module
+'Contributed by @ih0nza
 
 Option Strict On
 
