@@ -1,6 +1,7 @@
 ﻿' https://community.sw.siemens.com/s/question/0D54O000061xpllSAA/add-flat-pattern-through-the-api-woes
 ' https://community.sw.siemens.com/s/question/0D54O000061xs5ISAQ/applicationstartcommandcommandid
 ' https://community.sw.siemens.com/s/question/0D54O000061x3leSAA/from-design-model-to-flat-pattern
+' https://community.sw.siemens.com/s/question/0D54O00006rjisUSAQ/programicatcially-created-flat-pattern-cut-size-variables-Not-working
 
 Option Strict On
 
@@ -135,17 +136,43 @@ Module CreateFlatPattern
 
 			End If
 
+			'Dim X As Double
+			'Dim Y As Double
+
+			'Dim DocDimensionDict As Dictionary(Of String, SolidEdgeFrameworkSupport.Dimension)
+			'DocDimensionDict = GetDocDimensions(SEDoc)
+
+			'If ExitStatus = 0 Then
+			'	For Each DimensionName As String In DocDimensionDict.Keys
+			'		If DimensionName = "Flat_Pattern_Model_CutSizeX" Then
+			'			'Dim tf = DocDimensionDict(DimensionName).IsReadOnly
+			'			DocDimensionDict(DimensionName).Formula = CStr(X)
+			'		End If
+			'		If DimensionName = "Flat_Pattern_Model_CutSizeY" Then
+			'			DocDimensionDict(DimensionName).Value = Y
+			'		End If
+			'	Next
+			'End If
+
 			If ExitStatus = 0 Then
 				Try
 					FlatPatternModel = FlatPatternModels.Add(Model)
 					FlatPatterns = FlatPatternModel.FlatPatterns
 					'FlatPattern = FlatPatterns.Add(Edge)  ' Needs a face to get the flatpattern oriented to the top view
 					FlatPattern = FlatPatterns.Add(LongestLinearEdge, LargestFace, LargestFace)
+
+					FlatPattern.SetCutSizeValues(
+						MaxCutSizeX:=0, MaxCutSizeY:=0, ShowRangeBox:=True, AlarmOnX:=False, AlarmOnY:=False, UseDefaultValues:=True)
+
+					'FlatPatternModel.UpdateCutSize()
+					'FlatPatternModel.GetCutSize(X, Y)
+					'Dim i = 0
 				Catch ex As Exception
 					ExitStatus = 1
 					ErrorMessageList.Add("Unable to create flat pattern")
 				End Try
 			End If
+
 		End If
 
 		If ExitStatus = 0 Then
@@ -174,6 +201,41 @@ Module CreateFlatPattern
 
 		Return ExitStatus
 	End Function
+
+	'Public Function GetDocDimensions(SEDoc As SolidEdgeFramework.SolidEdgeDocument
+	') As Dictionary(Of String, SolidEdgeFrameworkSupport.Dimension)
+	'	Dim DocDimensionDict As New Dictionary(Of String, SolidEdgeFrameworkSupport.Dimension)
+
+	'	Dim Variables As SolidEdgeFramework.Variables = Nothing
+	'	Dim VariableListObject As SolidEdgeFramework.VariableList = Nothing
+	'	Dim Variable As SolidEdgeFramework.variable = Nothing
+	'	Dim Dimension As SolidEdgeFrameworkSupport.Dimension = Nothing
+	'	Dim VariableTypeName As String
+
+	'	Try
+	'		Variables = DirectCast(SEDoc.Variables, SolidEdgeFramework.Variables)
+
+	'		VariableListObject = DirectCast(Variables.Query(pFindCriterium:="*",
+	'							  NamedBy:=SolidEdgeConstants.VariableNameBy.seVariableNameByBoth,
+	'							  VarType:=SolidEdgeConstants.VariableVarType.SeVariableVarTypeBoth),
+	'							  SolidEdgeFramework.VariableList)
+
+	'		' Populate dictionary
+	'		For Each VariableListItem In VariableListObject.OfType(Of Object)()
+	'			VariableTypeName = Microsoft.VisualBasic.Information.TypeName(VariableListItem)
+
+	'			If VariableTypeName.ToLower() = "dimension" Then
+	'				Dimension = CType(VariableListItem, SolidEdgeFrameworkSupport.Dimension)
+	'				DocDimensionDict(Dimension.DisplayName) = Dimension
+	'			End If
+	'		Next
+
+	'	Catch ex As Exception
+	'	End Try
+
+	'	Return DocDimensionDict
+	'End Function
+
 
 	Private Function GetLongestLinearEdge(LargestFace As SolidEdgeGeometry.Face) As SolidEdgeGeometry.Edge
 
