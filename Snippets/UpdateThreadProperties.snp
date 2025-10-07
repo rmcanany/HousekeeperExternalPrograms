@@ -1,4 +1,4 @@
-' Contributed by @[Francesco Arfilli]
+' Contributed by @farfilli
 
 Dim HoleDataCollection As SolidEdgePart.HoleDataCollection = Nothing
 
