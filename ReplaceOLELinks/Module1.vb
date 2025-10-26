@@ -1,4 +1,6 @@
 ﻿Option Strict On
+Imports System.Runtime.CompilerServices
+
 Module Module1
 
 	Dim ExitCode As Integer
@@ -122,6 +124,7 @@ Module Module1
 									End If
 								Next
 								If TemplateBlock Is Nothing Then
+									ExitCode = 1
 									ErrorMessageList.Add($"Template block not found '{TemplateBlockName}'")
 									Continue For
 								End If
@@ -142,9 +145,12 @@ Module Module1
 									SmartFrame2d.Delete()
 									SEApp.DoIdle()
 								Else
+									ExitCode = 1
 									ErrorMessageList.Add($"Sheet already has a block named '{TemplateBlockName}'")
 								End If
+
 							Catch ex As Exception
+								ExitCode = 1
 								ErrorMessageList.Add($"Could not process OLE Link '{LinkFilename}'")
 								ErrorMessageList.Add($"Error was {ex.Message}")
 							End Try
@@ -153,12 +159,15 @@ Module Module1
 					End If
 				End If
 			Next
-			' Report if a link file name was not found in the file.
-			For Each LinkFilename As String In LinkFilenames
-				If Not FoundLinkFilenames.Contains(LinkFilename) Then
-					ErrorMessageList.Add($"Link file name not found '{LinkFilename}'")
-				End If
-			Next
+
+			'' Report if a link file name was not found in the file.
+			'For Each LinkFilename As String In LinkFilenames
+			'	If Not FoundLinkFilenames.Contains(LinkFilename) Then
+			'		ExitCode = 1
+			'		ErrorMessageList.Add($"Link file name not found '{LinkFilename}'")
+			'	End If
+			'Next
+
 		End If
 
 
@@ -235,7 +244,11 @@ Module Module1
 			Dim tmpOutList As List(Of String) = ProgramSettings(VariableName).Split(","c).ToList
 
 			For Each s As String In tmpOutList
-				If Not s.Trim = "" Then OutList.Add(s.Trim)
+				If VariableName = "LinkFilenames" Then
+					OutList.Add(s.Trim)
+				Else
+					If Not s.Trim = "" Then OutList.Add(s.Trim)
+				End If
 			Next
 
 			If OutList.Count = 0 Then OutList = Nothing
@@ -256,7 +269,7 @@ Module Module1
 		ErrorFilename = String.Format("{0}\error_messages.txt", StartupPath)
 		IO.File.WriteAllLines(ErrorFilename, ErrorMessageList)
 
-		' See if Housekeeper is running.  If not, show errors in a MsgBox.
+		' If Housekeeper is not running, the program is running stand-alone.  If so, show errors in a MsgBox.
 		For Each P As Process In Process.GetProcesses()
 			If P.ProcessName.ToLower = "housekeeper" Then
 				HousekeeperRunning = True
