@@ -1,0 +1,32 @@
+' Program settings
+
+' Blank lines, or those preceeded by a single quote (') comment character are ignored.
+
+' You can/must change the variable values, but not their names.
+' The names are used by the program.  It won't work if you change them.
+' The variable names are: BackgroundSheets, TemplateFilename, LinkFilenames, and BlockNames.
+
+' BACKGROUND SHEET NAMES
+' Names of the drawing background sheets to process.  Un-comment and edit one of the following lines.
+' This can be a single name:
+BackgroundSheetNames = Hardigg D
+' A comma-delimited list:
+' BackgroundSheetNames = Hardigg C, Hardigg D
+' Or everything:
+' BackgroundSheetNames = *
+
+' TEMPLATE FILE NAME
+' This is the name of the file that holds the Blocks that will replace the OLE linked objects.
+' The full path is required.
+TemplateFilename = C:\data\CAD\scripts\SolidEdgeHousekeeper\reference\20251022_replace_OLE_links\TOLERANCE BLOCKS.dft
+
+' LINK FILE NAMES
+' This is a comma-delimited list of OLE linked file names to replace with blocks.
+' Only the file name, not the path, is needed.
+LinkFilenames = PETOLERANCE.doc, PUTOLERANCE.doc
+
+' BLOCK NAMES
+' This is a comma-delimited list of the blocks to replace the OLE linked objects.
+' Its order matches that of LinkFileNames.  The first block will replace the first link, the second block replaces the second link, etc.
+BlockNames = PE TOLERANCE, PU TOLERANCE
+

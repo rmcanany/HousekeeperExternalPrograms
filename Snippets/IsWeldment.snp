@@ -1,0 +1,20 @@
+If DocType = ".asm" Then
+    Dim tmpSEDoc As SolidEdgeAssembly.AssemblyDocument = CType(SEDoc, SolidEdgeAssembly.AssemblyDocument)
+
+    If tmpSEDoc.WeldmentAssembly Then
+        Try
+            Dim PropertySets As SolidEdgeFramework.PropertySets = CType(tmpSEDoc.Properties, SolidEdgeFramework.PropertySets)
+            Dim PropertySet As SolidEdgeFramework.Properties = PropertySets.Item("Custom")
+            Dim Prop As SolidEdgeFramework.Property = PropertySet.Item("IsWeldment")
+
+            Prop.Value = "True"
+
+            PropertySets.Save()
+            SEApp.DoIdle()
+            SEDoc.Save()
+            SEApp.DoIdle()
+        Catch ex As Exception
+            ErrorMessageList.Add("Unable to process 'IsWeldment' property")
+        End Try
+    End If
+End If

@@ -1,0 +1,23 @@
+' Program settings
+
+' CUSTOM PROPERTY NAMES
+' Enter the names of the properties you want to have placed in your model files.  
+' Don't change the variable names (QuantityPropertyName, SourceAssemblyPropertyName)
+' Those are used by the program.  It won't work if you change them.
+
+QuantityPropertyName = Quantity
+SourceAssemblyPropertyName = Source_Assembly
+
+
+' QUANTITY MULTIPLIER
+' The program multiplies the quantities by this number.  See the Readme for details.
+
+QuantityMultiplier = 1
+
+
+' WELDMENTS
+' Normally in reports, assemblies marked as weldments are counted, but not the 
+' parts or subassemblies they contain.  
+' To include them, set the following variable to True.  Otherwise set it to False.
+
+IncludeWeldmentParts = False
