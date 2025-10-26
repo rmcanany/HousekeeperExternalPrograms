@@ -79,27 +79,33 @@ Module Module1
 		End If
 
 		If ExitCode = 0 Then
+			Dim FoundLinkFilenames As New List(Of String)
 			For Each Sheet As SolidEdgeDraft.Sheet In SEDoc.Sheets
 				If BackgroundSheetNames.Contains(Sheet.Name) Or BackgroundSheetNames.Contains("*") Then
 					Dim SmartFrames2d As SolidEdgeFrameworkSupport.SmartFrames2d = CType(Sheet.SmartFrames2d, SolidEdgeFrameworkSupport.SmartFrames2d)
 					If SmartFrames2d IsNot Nothing Then
 						Dim SmartFrame2d As SolidEdgeFrameworkSupport.SmartFrame2d
-						Dim OLEFilename As String = ""
+						Dim LinkFilename As String = ""
 						For i As Integer = SmartFrames2d.Count - 1 To 0 Step -1
 							Try
+								' Check the SmartFrame2d link name and add it to the list of found names.
 								SmartFrame2d = CType(SmartFrames2d(i), SolidEdgeFrameworkSupport.SmartFrame2d)
-								OLEFilename = SmartFrame2d.LinkMoniker
-								If OLEFilename = "" Then OLEFilename = "PUTOLERANCE.doc"
-								OLEFilename = IO.Path.GetFileName(OLEFilename)
+								LinkFilename = SmartFrame2d.LinkMoniker
+								'If LinkFilename = "" Then LinkFilename = "PUTOLERANCE.doc"
+								LinkFilename = IO.Path.GetFileName(LinkFilename)
+								If Not FoundLinkFilenames.Contains(LinkFilename) Then FoundLinkFilenames.Add(LinkFilename)
 
+								' Get the index of the link file name in LinkFilenames
 								Dim idx As Integer = -1
 								For j As Integer = 0 To LinkFilenames.Count - 1
-									If LinkFilenames(j) = OLEFilename Then
+									If LinkFilenames(j) = LinkFilename Then
 										idx = j
 										Exit For
 									End If
 								Next
 
+								' Get the template block name corresponding to the link name.
+								' Skip if the link file name was not in LinkFilenames
 								Dim TemplateBlockName As String
 								If idx = -1 Then
 									Continue For
@@ -107,6 +113,7 @@ Module Module1
 									TemplateBlockName = BlockNames(idx)
 								End If
 
+								' Find the block in the template.  Skip if not found.
 								Dim TemplateBlock As SolidEdgeDraft.Block = Nothing
 								For Each tmpTemplateBlock As SolidEdgeDraft.Block In TemplateDoc.Blocks
 									If tmpTemplateBlock.Name = TemplateBlockName Then
@@ -114,7 +121,10 @@ Module Module1
 										Exit For
 									End If
 								Next
-								If TemplateBlock Is Nothing Then Continue For
+								If TemplateBlock Is Nothing Then
+									ErrorMessageList.Add($"Template block not found '{TemplateBlockName}'")
+									Continue For
+								End If
 
 								Dim DocBlock As SolidEdgeDraft.Block = Nothing
 								For Each tmpDocBlock As SolidEdgeDraft.Block In SEDoc.Blocks
@@ -122,11 +132,11 @@ Module Module1
 									Exit For
 								Next
 
-								Dim x As Double
-								Dim y As Double
-								SmartFrame2d.GetOrigin(x, y)
-
 								If DocBlock Is Nothing Then
+									Dim x As Double
+									Dim y As Double
+									SmartFrame2d.GetOrigin(x, y)
+
 									DocBlock = SEDoc.Blocks.CopyBlock(TemplateBlock)
 									Dim BlockOccurrence As SolidEdgeDraft.BlockOccurrence = Sheet.BlockOccurrences.Add(DocBlock.Name, x, y)
 									SmartFrame2d.Delete()
@@ -135,12 +145,18 @@ Module Module1
 									ErrorMessageList.Add($"Sheet already has a block named '{TemplateBlockName}'")
 								End If
 							Catch ex As Exception
-								ErrorMessageList.Add($"Could not process OLE Link '{OLEFilename}'")
+								ErrorMessageList.Add($"Could not process OLE Link '{LinkFilename}'")
 								ErrorMessageList.Add($"Error was {ex.Message}")
 							End Try
 						Next
 
 					End If
+				End If
+			Next
+			' Report if a link file name was not found in the file.
+			For Each LinkFilename As String In LinkFilenames
+				If Not FoundLinkFilenames.Contains(LinkFilename) Then
+					ErrorMessageList.Add($"Link file name not found '{LinkFilename}'")
 				End If
 			Next
 		End If
