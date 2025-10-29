@@ -4,4 +4,4 @@ An automated method to replace OLE inserted objects with SE-native blocks in dra
 
 It's pretty general-purpose and you may be able to use it as-is.  However, if you need to tweak things, feel free.  It's open source after all.
 
-Edit the configuration file, program-settings.txt, to identify the OLE names and their block replacements, and template file that contains the blocks.
+Edit the configuration file, program_settings.txt, to identify the OLE names and their block replacements, and template file that contains the blocks.

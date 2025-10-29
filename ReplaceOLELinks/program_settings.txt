@@ -4,7 +4,7 @@
 
 ' You can/must change the variable values, but not their names.
 ' The names are used by the program.  It won't work if you change them.
-' The variable names are: BackgroundSheets, TemplateFilename, LinkFilenames, and BlockNames.
+' The variable names are: BackgroundSheets, TemplateFilename, LinkFilenames, BlockNames.
 
 ' BACKGROUND SHEET NAMES
 ' Names of the drawing background sheets to process.  Un-comment and edit one of the following lines.
@@ -23,10 +23,11 @@ TemplateFilename = C:\data\CAD\scripts\SolidEdgeHousekeeper\reference\20251022_r
 ' LINK FILE NAMES
 ' This is a comma-delimited list of OLE linked file names to replace with blocks.
 ' Only the file name, not the path, is needed.
-LinkFilenames = PETOLERANCE.doc, PUTOLERANCE.doc
+LinkFilenames = PETOLERANCE.doc, , PUTOLERANCE.doc
 
 ' BLOCK NAMES
 ' This is a comma-delimited list of the blocks to replace the OLE linked objects.
 ' Its order matches that of LinkFileNames.  The first block will replace the first link, the second block replaces the second link, etc.
-BlockNames = PE TOLERANCE, PU TOLERANCE
+BlockNames = PE TOLERANCE, PU TOLERANCE, PU TOLERANCE
+
 
