@@ -102,7 +102,7 @@ Module Module1
 
 								If ReportLinksOnly = "true" Then
 									ExitCode = 1
-									ErrorMessageList.Add($"Sheet: {Sheet.Name}, Link file name: '{LinkFilename}'")
+									ErrorMessageList.Add($"Sheet: '{Sheet.Name}', Link file name: '{LinkFilename}'")
 									Continue For
 								End If
 

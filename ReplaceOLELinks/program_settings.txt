@@ -7,7 +7,8 @@
 ' The variable names are: ReportLinksOnly, BackgroundSheets, TemplateFilename, LinkFilenames, BlockNames.
 
 ' REPORT LINKS ONLY
-' This is an option to simply report the link names found during a run.  It can be used to better understand what the files contain before actually processing them.
+' This is an option to simply report the link names found during a run.  The file is left unchanged.
+' This can be used to better understand the files contents before actually processing them.
 ReportLinksOnly = True
 
 ' BACKGROUND SHEET NAMES
