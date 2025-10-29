@@ -4,7 +4,11 @@
 
 ' You can/must change the variable values, but not their names.
 ' The names are used by the program.  It won't work if you change them.
-' The variable names are: BackgroundSheets, TemplateFilename, LinkFilenames, BlockNames.
+' The variable names are: ReportLinksOnly, BackgroundSheets, TemplateFilename, LinkFilenames, BlockNames.
+
+' REPORT LINKS ONLY
+' This is an option to simply report the link names found during a run.  It can be used to better understand what the files contain before actually processing them.
+ReportLinksOnly = True
 
 ' BACKGROUND SHEET NAMES
 ' Names of the drawing background sheets to process.  Un-comment and edit one of the following lines.

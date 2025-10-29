@@ -24,7 +24,10 @@ Module Module1
 		' Sets ExitCode = 1 on error.
 		ProgramSettings = GetProgramSettings()
 
-		' The variable names are: BackgroundSheetNames, TemplateFilename, LinkFilenames, BlockNames
+		' The variable names are: ReportLinksOnly, BackgroundSheetNames, TemplateFilename, LinkFilenames, BlockNames
+
+		Dim ReportLinksOnly As String = GetSettingsList(ProgramSettings, "ReportLinksOnly")(0).ToLower
+		If ReportLinksOnly Is Nothing Then ExitCode = 1 : ErrorMessageList.Add("Report links only variable not found")
 
 		Dim BackgroundSheetNames As List(Of String) = GetSettingsList(ProgramSettings, "BackgroundSheetNames")
 		If BackgroundSheetNames Is Nothing Then ExitCode = 1 : ErrorMessageList.Add("Background sheet names not found")
@@ -93,9 +96,15 @@ Module Module1
 								' Check the SmartFrame2d link name and add it to the list of found names.
 								SmartFrame2d = CType(SmartFrames2d(i), SolidEdgeFrameworkSupport.SmartFrame2d)
 								LinkFilename = SmartFrame2d.LinkMoniker
-								'If LinkFilename = "" Then LinkFilename = "PUTOLERANCE.doc"
+
 								LinkFilename = IO.Path.GetFileName(LinkFilename)
 								If Not FoundLinkFilenames.Contains(LinkFilename) Then FoundLinkFilenames.Add(LinkFilename)
+
+								If ReportLinksOnly = "true" Then
+									ExitCode = 1
+									ErrorMessageList.Add($"Sheet: {Sheet.Name}, Link file name: '{LinkFilename}'")
+									Continue For
+								End If
 
 								' Get the index of the link file name in LinkFilenames
 								Dim idx As Integer = -1
