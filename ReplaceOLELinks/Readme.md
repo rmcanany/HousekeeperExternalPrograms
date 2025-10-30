@@ -12,6 +12,8 @@ The program can run stand-alone or in batch mode.  To run stand-alone, double-cl
 
 Batch mode uses Housekeeper's `Run External Program` command.  On the **Task Tab**, enable the command, then click the `Program` button and select the executable named above.
 
+In either case, Windows may have placed a lock on the folder containing the executable.  Right-click it and make sure it is not `Blocked` or `Read-only`.  Also, the first time you run the program you may get a `Windows protected your PC` message.  You can click `More info` followed by `Run anyway` to launch it.
+
 ## Setup
 
 A text file, `program_settings.txt`, holds the configuration options for the program.
