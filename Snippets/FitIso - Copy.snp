@@ -2,3 +2,5 @@ SEApp.StartCommand(32810)
 SEApp.DoIdle()
 SEDoc.Save()
 SEApp.DoIdle()
+ExitStatus = 1
+ErrorMessageList.Add("Success")

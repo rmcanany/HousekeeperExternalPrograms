@@ -1,0 +1,25 @@
+If DocType = ".dft" Then
+    Dim tmpSEDoc As SolidEdgeDraft.DraftDocument = CType(SEDoc, SolidEdgeDraft.DraftDocument)
+    Dim Blocks As SolidEdgeDraft.Blocks = tmpSEDoc.Blocks
+
+    For Each Block As SolidEdgeDraft.Block In Blocks
+        Dim BlockName As String = Block.Name
+        Try
+            Block.Delete()
+        Catch ex As Exception
+            ExitStatus = 1
+            ErrorMessageList.Add(String.Format("Could not delete block '{0}'", BlockName))
+            ErrorMessageList.Add(String.Format("Error was: '{0}'", ex.Message))
+        End Try
+    Next
+
+    If ExitStatus = 0 Then
+        Try
+            SEDoc.Save()
+            SEApp.DoIdle()
+        Catch ex As Exception
+            ExitStatus = 1
+            ErrorMessageList.Add(String.Format("An error occurred saving the file: {0}", ex.Message))
+        End Try
+    End If
+End If

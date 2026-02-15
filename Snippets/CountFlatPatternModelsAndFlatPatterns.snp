@@ -1,0 +1,29 @@
+Dim FlatPatternModels As SolidEdgePart.FlatPatternModels = Nothing
+Dim Models As SolidEdgePart.Models = Nothing
+
+Select Case DocType
+    Case ".par"
+        Dim tmpSEDoc As SolidEdgePart.PartDocument = CType(SEDoc, SolidEdgePart.PartDocument)
+        FlatPatternModels = tmpSEDoc.FlatPatternModels
+        Models = tmpSEDoc.Models
+    Case ".psm"
+        Dim tmpSEDoc As SolidEdgePart.SheetMetalDocument = CType(SEDoc, SolidEdgePart.SheetMetalDocument)
+        FlatPatternModels = tmpSEDoc.FlatPatternModels
+        Models = tmpSEDoc.Models
+End Select
+
+If FlatPatternModels.Count > 1 Then
+    ExitStatus = 1
+    ErrorMessageList.Add(String.Format("FlatPatternModels.Count = {0}", FlatPatternModels.Count))
+End If
+If FlatPatternModels.Count = 1 Then
+    Dim FlatPatternModel As SolidEdgePart.FlatPatternModel
+    FlatPatternModel = FlatPatternModels.Item(1)
+
+    Dim FlatPatterns As SolidEdgePart.FlatPatterns
+    FlatPatterns = FlatPatternModel.FlatPatterns
+    If FlatPatterns.Count > 1 Then
+        ExitStatus = 1
+        ErrorMessageList.Add(String.Format("FlatPatterns.Count = {0}", FlatPatterns.Count))
+    End If
+End If
