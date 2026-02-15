@@ -1,0 +1,33 @@
+' Program settings
+
+' Blank lines, or those preceeded by a single quote ('), like this one, are ignored.
+
+' You can/must change the variable values, but not their names.
+' The variable names appear BEFORE the equals sign (=) their value AFTER.
+' The names are used by the program.  It won't work if you change them.
+' The variable names are: DraftListPath, BackgroundSheetNames, and PartsListStyleNames.
+
+' In the case of a comma-delimited list, if a variable value itself contains a comma,
+' it must be preceeded by a backslash (\) to be interpreted correctly.
+' Eg, if the variable value is "ABC-1,1", it must be entered as "ABC-1\,1"
+
+' One more thing about a comma-delimited list.  It can contain many values, or only one.
+' It either case a trailing comma is not allowed, for example:
+' Incorrect: BackgroundSheetNames = A3-quer, A2-quer, A1-quer, A0-quer,
+' Correct:   BackgroundSheetNames = A3-quer, A2-quer, A1-quer, A0-quer
+
+' DRAFTLIST PATH
+' This is the file that holds the Parts List Style settings.  A full path to the file is required.
+DraftListPath = C:\Program Files\Siemens\Solid Edge 2025\Template\Reports\DraftList.txt
+
+' BACKGROUND SHEET NAMES
+' Names of the drawing background sheets that have parts list styles associated with them.
+' It is treated as a comma-delimited list, even if there is only one entry.
+BackgroundSheetNames = A3-quer, A2-quer, A1-quer, A0-quer
+
+' PARTS LIST STYLE NAMES
+' These are the style names that correspond to the background sheets.
+' There must be a one-to-one correspondence between the background sheets and their parts style.
+' It too is treated as a comma-delimited list, even if there is only one entry.
+PartsListStyleNames = T - A3, T - A2, T - A1, T - A0
+
