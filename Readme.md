@@ -1,7 +1,7 @@
 ![Logo](logo.png)
 
 # Solid Edge Housekeeper External Programs
-2025 Robert McAnany
+2026 Robert McAnany
 
 Description and examples for Solid Edge Housekeeper's `Run External Program` task.
 
