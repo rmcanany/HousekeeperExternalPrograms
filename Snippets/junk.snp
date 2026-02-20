@@ -1,5 +1,0 @@
-
-            Dim something = SolidEdgeFramework.ApplicationGlobalConstants.seApplicationGlobalUseDimensionStyleElementMapLinDim
-            Dim avalue As Object = Nothing
-            SEApp.GetGlobalParameter(something, avalue)
-            Return avalue

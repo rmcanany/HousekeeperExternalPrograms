@@ -3,6 +3,10 @@
 Companion repo with instructions and program examples for the 
 Solid Edge Housekeeper `Run external program` task.
 
+## V2026.1
+
+Added ReplaceOLELinks, UpdatePartStyleFromTemplate and several Snippet examples.
+
 ## V2025.3
 
 Added a code snippet contributed by @ih0nza `SaveAndTogglePreviewGeometry.snp`.  Thank you!
