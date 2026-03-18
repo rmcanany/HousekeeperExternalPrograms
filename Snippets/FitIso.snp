@@ -1,4 +1,8 @@
-SEApp.StartCommand(32810)
+If DocType = ".dft" Then
+    SEApp.StartCommand(10202)
+Else
+    SEApp.StartCommand(32810)
+End If
 SEApp.DoIdle()
 SEDoc.Save()
 SEApp.DoIdle()
