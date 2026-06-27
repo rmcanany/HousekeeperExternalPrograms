@@ -1,3 +1,6 @@
+## v 2026.2
+Added conversion to sheetmetal for `*.psm` files
+
 ## v 2025.1
 Convert to external program
 

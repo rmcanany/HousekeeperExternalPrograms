@@ -1,6 +1,6 @@
 ﻿Option Strict On
 
-Imports Newtonsoft.Json
+'Imports Newtonsoft.Json
 
 Module Module1
 
@@ -141,6 +141,52 @@ Module Module1
 
 			End If
 
+			If Proceed Then
+				'Convert to sheetmetal.  First, you must verify that you are in ordered mode.
+				If DocType = "psm" And Models.Count > 0 Then
+					Dim tmpSEDoc As SolidEdgePart.SheetMetalDocument
+					tmpSEDoc = CType(SEDoc, SolidEdgePart.SheetMetalDocument)
+
+					If tmpSEDoc.ModelingMode = SolidEdgePart.ModelingModeConstants.seModelingModeSynchronous Then
+						tmpSEDoc.ModelingMode = SolidEdgePart.ModelingModeConstants.seModelingModeOrdered
+					End If
+
+					Model = Models.Item(1)
+
+					Dim objBody As SolidEdgeGeometry.Body = CType(Model.Body, SolidEdgeGeometry.Body)
+					Dim objFaces As SolidEdgeGeometry.Faces = CType(objBody.Faces(SolidEdgeGeometry.FeatureTopologyQueryTypeConstants.igQueryAll), SolidEdgeGeometry.Faces)
+					Dim objBaseFace As SolidEdgeGeometry.Face = CType(objFaces.Item(1), SolidEdgeGeometry.Face)
+					Dim maxArea As Double = 0
+					For i As Integer = 1 To objFaces.Count  'Select the biggest face
+						Dim f As SolidEdgeGeometry.Face = CType(objFaces.Item(i), SolidEdgeGeometry.Face)
+						If f.Area > maxArea Then
+							maxArea = f.Area
+							objBaseFace = f
+						End If
+					Next
+					Dim objAllEdges As SolidEdgeGeometry.Edges = CType(objBody.Edges(SolidEdgeGeometry.FeatureTopologyQueryTypeConstants.igQueryAll), SolidEdgeGeometry.Edges)
+					Dim aEdges As Array = Array.CreateInstance(GetType(Object), objAllEdges.Count)
+					For i As Integer = 1 To objAllEdges.Count  'Count all the edges
+						aEdges.SetValue(objAllEdges.Item(i), i - 1)
+					Next
+					Try
+						Model.ConvToSMs.AddEx(objBaseFace, 1, aEdges)
+						' objModel.ConvToSMs.AddEx(objBaseFace, 1, aEdges, Nothing, 0.0, 0.0) ' Complete command
+					Catch ex As Exception
+						' Console.WriteLine("Error: " & ex.Message)
+
+						'' Maybe not a big enough error to stop processing.  Ignoring for now.
+						'Proceed = False
+						'ExitStatus = 1
+						'ErrorMessageList.Add("Error: " & ex.Message)
+					End Try
+
+					tmpSEDoc.ModelingMode = SolidEdgePart.ModelingModeConstants.seModelingModeSynchronous
+
+				End If
+
+			End If
+
 			If Proceed And WasOrdered Then
 				'Finish in Ordered Mode ready to work (This could be an option)
 				Select Case DocType
@@ -156,11 +202,11 @@ Module Module1
 
 			End If
 
-			If Proceed Then
-				'Save file
-				SEDoc.Save()
-				SEApp.DoIdle()
-			End If
+			'If Proceed Then
+			'	'Save file
+			'	SEDoc.Save()
+			'	SEApp.DoIdle()
+			'End If
 
 			If ExitStatus = 0 Then
 				If SEDoc.ReadOnly Then
@@ -364,7 +410,7 @@ Module Module1
 		Try
 			JSONString = IO.File.ReadAllText(SettingsFilename)
 
-			tmpJSONDict = JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(JSONString)
+			tmpJSONDict = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(JSONString)
 
 		Catch ex As Exception
 		End Try

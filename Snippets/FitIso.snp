@@ -6,3 +6,4 @@ End If
 SEApp.DoIdle()
 SEDoc.Save()
 SEApp.DoIdle()
+'ErrorMessageLis.Add("No errors")
