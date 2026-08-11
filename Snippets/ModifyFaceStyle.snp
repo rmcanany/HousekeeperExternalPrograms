@@ -1,0 +1,45 @@
+Dim Filename As String = "C:\Program Files\Siemens\Solid Edge 2025\Images\textures\other\threads.jpg"
+Dim TargetFaceStyleName As String = "Thread"
+
+Dim FaceStyles As SolidEdgeFramework.FaceStyles = Nothing
+
+Select Case DocType
+    Case ".asm"
+        Dim tmpSEDoc As SolidEdgeAssembly.AssemblyDocument = CType(SEDoc, SolidEdgeAssembly.AssemblyDocument)
+        FaceStyles = CType(tmpSEDoc.FaceStyles, SolidEdgeFramework.FaceStyles)
+    Case ".par"
+        Dim tmpSEDoc As SolidEdgePart.PartDocument = CType(SEDoc, SolidEdgePart.PartDocument)
+        FaceStyles = CType(tmpSEDoc.FaceStyles, SolidEdgeFramework.FaceStyles)
+    Case ".asm"
+        Dim tmpSEDoc As SolidEdgePart.SheetMetalDocument = CType(SEDoc, SolidEdgePart.SheetMetalDocument)
+        FaceStyles = CType(tmpSEDoc.FaceStyles, SolidEdgeFramework.FaceStyles)
+End Select
+
+If FaceStyles IsNot Nothing Then
+    Dim TargetFaceStyle As SolidEdgeFramework.FaceStyle = Nothing
+
+    For Each FaceStyle As SolidEdgeFramework.FaceStyle In FaceStyles
+        If FaceStyle.StyleName = TargetFaceStyleName Then
+            TargetFaceStyle = FaceStyle
+            Exit For
+        End If
+    Next
+
+    If TargetFaceStyle IsNot Nothing Then
+        TargetFaceStyle.BumpmapFileName = Filename
+        TargetFaceStyle.BumpmapUnits = 2
+        TargetFaceStyle.SetBumpmapScale(1, 1)
+        'TargetFaceStyle.BumpmapScaleX = TargetFaceStyle.TextureScaleX
+        'TargetFaceStyle.BumpmapScaleY = TargetFaceStyle.TextureScaleY
+        TargetFaceStyle.BumpmapHeight = 0.25
+        TargetFaceStyle.BumpmapInvert = 0 ' 0 = False (maybe -- toggles in the UI, but no value change in SESpy)
+
+        TargetFaceStyle.TextureFileName = Filename
+        TargetFaceStyle.TextureUnits = 2 ' 1 = World, 2 = Surface
+        TargetFaceStyle.TextureScaleX = 1
+        TargetFaceStyle.TextureScaleY = 1
+
+        SEDoc.Save()
+        SEApp.DoIdle()
+    End If
+End If

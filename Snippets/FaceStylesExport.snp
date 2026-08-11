@@ -1,0 +1,36 @@
+Dim Outfile As String = "C:\Data\SEFaceStyles.tsv"
+Dim OutList As New List(Of String)
+
+Dim ColumnList As New List(Of String)
+ColumnList.Add("StyleName")
+ColumnList.AddRange({"DiffuseRed", "DiffuseGreen", "DiffuseBlue"})
+ColumnList.AddRange({"SpecularRed", "SpecularGreen", "SpecularBlue"})
+' etc.
+
+OutList.Add(String.Join(vbTab, ColumnList))
+
+Dim DocFaceStyles As SolidEdgeFramework.FaceStyles = Nothing
+Select Case DocType
+    Case ".asm"
+        Dim tmpSEDoc As SolidEdgeAssembly.AssemblyDocument = CType(SEDoc, SolidEdgeAssembly.AssemblyDocument)
+        DocFaceStyles = CType(tmpSEDoc.FaceStyles, SolidEdgeFramework.FaceStyles)
+    Case ".par", ".psm"
+        Dim tmpSEDoc As SolidEdgePart.PartDocument = CType(SEDoc, SolidEdgePart.PartDocument)
+        DocFaceStyles = CType(tmpSEDoc.FaceStyles, SolidEdgeFramework.FaceStyles)
+End Select
+
+If DocFaceStyles Is Nothing Then
+    ErrorMessageList.Add("Could not read face styles")
+Else
+    For Each FS As SolidEdgeFramework.FaceStyle In DocFaceStyles
+        Dim tmpList As New List(Of String)
+        tmpList.Add(FS.StyleName)
+        tmpList.AddRange({CStr(FS.DiffuseRed), CStr(FS.DiffuseGreen), CStr(FS.DiffuseBlue)})
+        tmpList.AddRange({CStr(FS.SpecularRed), CStr(FS.SpecularGreen), CStr(FS.SpecularBlue)})
+        ' etc.
+
+        OutList.Add(String.Join(vbTab, tmpList))
+    Next
+
+    IO.File.WriteAllLines(Outfile, OutList)
+End If

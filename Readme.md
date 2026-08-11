@@ -71,6 +71,8 @@ NosyBottle: [**NosyBottle**](https://github.com/Nosybottle)
 
 ZaPpInG: [**lrmoreno007**](https://github.com/lrmoreno007)
 
+kjellderksen: [**kjellderksen**](https://github.com/kjellderksen)
+
 
 To suggest other sources, including your own, feel free to message me, RobertMcAnany, on the [**Solid Edge Forum**](https://community.sw.siemens.com/s/topic/0TO4O000000MihiWAC/solid-edge).
 
