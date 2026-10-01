@@ -4,17 +4,32 @@ Option Strict On
 ' It is a structured storage file with one stream per display configuration
 ' under the "Configs" storage, plus an "Info" stream naming the active one.
 '
-' Each configuration stream is a 20-byte header followed by a tree of nodes,
-' all little-endian UInt32 values:
+' Each configuration stream is a header followed by a tree of nodes, all
+' little-endian UInt32 values except for names.  The header is:
 '
-'   Node:              Flags, Flags2, OccurrenceID
+'   ConfigurationType, Version, (counter), 0, [SubFormat -- version 5 only]
+'
+' The configuration type is described at ParseConfiguration.  The layout of a
+' node depends on the version:
+'
+'   Version 5, subformat 2 (current):  Flags, Flags2, OccurrenceID
+'   Version 5, subformat 1:            Flags, OccurrenceID
+'   Version 4:                         Flags, 0, then for named nodes NameLength, Name (ASCII, null-terminated)
+'
 '   Assembly node:     Node, EntryCount, EntryCount x 12 bytes, ChildCount, ChildCount x child nodes
 '   Collapsed node:    Node, ChildCount, ChildCount x child nodes
 '
 ' Flags >> 28 = 9 marks an assembly node (the root, ID 0, is the assembly itself),
-' 4 a part.  Flags bit 2 means hidden in that configuration.  The 12-byte entries
-' look like the document's own objects (reference planes, coordinate systems,
-' etc.) and their visibility; they're not needed here and are skipped.
+' 4 a part.  Version 4 identifies occurrences by name (eg. "bearing1.par:1")
+' rather than ID: B is a named assembly node, 6 a named part.  Flags bit 2 means
+' hidden in that configuration (version 5).  The 12-byte entries look like the
+' document's own objects (reference planes, coordinate systems, etc.) and their
+' visibility; they're not needed here and are skipped.
+'
+' 20261001 Versions 4 and 5/1 were found in files from older Solid Edge versions,
+' alongside per-user "default,<username>" configurations.  Version 2, older
+' still, has no node tree -- entries look like paths of storage names
+' ("Layouts", "References") -- and isn't supported.
 '
 ' 20261001 Flags >> 28 = 8 (seen as &H80000002) is a hidden subassembly stored
 ' without its contents.  Every one seen so far had a count of 0; treating a
@@ -25,8 +40,9 @@ Option Strict On
 ' part inside a since-deleted subassembly, so its meaning is unknown; it isn't
 ' needed for the check.
 '
-' Occurrence IDs are scoped per document -- a subassembly node's children are
-' IDs within that subassembly, matching Occurrence.OccurrenceID there.  The tree
+' Occurrence IDs (and names) are scoped per document -- a subassembly node's
+' children are IDs within that subassembly, matching Occurrence.OccurrenceID
+' (or Occurrence.Name) there.  The tree
 ' is the configuration as it was last saved, so an ID that no longer matches a
 ' current occurrence is a part deleted since, which is what triggers Solid Edge's
 ' "One or more parts have been deleted..." warning when the configuration is
@@ -34,13 +50,23 @@ Option Strict On
 
 Public Class ConfigurationNode
 	Public Property OccurrenceID As Integer
+
+	' Set instead of OccurrenceID for version 4 configurations, otherwise Nothing.
+	Public Property OccurrenceName As String
+
 	Public Property Flags As UInteger
 	Public Property Flags2 As UInteger
 	Public Property Children As New List(Of ConfigurationNode)
 
 	Public ReadOnly Property IsAssembly As Boolean
 		Get
-			Return (Flags >> 28) = 9UI
+			Return (Flags >> 28) = 9UI OrElse (Flags >> 28) = &HBUI
+		End Get
+	End Property
+
+	Public ReadOnly Property IsNamed As Boolean
+		Get
+			Return (Flags >> 28) = 6UI OrElse (Flags >> 28) = &HBUI
 		End Get
 	End Property
 
@@ -59,13 +85,24 @@ End Class
 
 Public Module ConfigurationFile
 
-	Private Const HeaderLength As Integer = 20
 	Private Const EntryLength As Integer = 12
+	Private Const MinimumNodeLength As Integer = 8
+
+	' How nodes are laid out in a given configuration stream; see the top of the file.
+	Private Class NodeFormat
+		Public Version As UInteger
+		Public HasFlags2 As Boolean
+	End Class
 
 	' Returns each configuration's saved tree, keyed by configuration name.  The
 	' .cfg file is locked while the assembly is open in Solid Edge, so a temporary
-	' copy is read instead.
-	Public Function ReadConfigurations(CfgFilename As String) As SortedDictionary(Of String, ConfigurationNode)
+	' copy is read instead.  A configuration that can't be parsed goes to
+	' ConfigurationErrors (name -> reason) instead, so one unreadable
+	' configuration doesn't keep the rest from being checked.
+	Public Function ReadConfigurations(
+		CfgFilename As String,
+		ConfigurationErrors As SortedDictionary(Of String, String)
+		) As SortedDictionary(Of String, ConfigurationNode)
 
 		Dim Result As New SortedDictionary(Of String, ConfigurationNode)(StringComparer.OrdinalIgnoreCase)
 
@@ -77,7 +114,7 @@ Public Module ConfigurationFile
 				Try
 					Result(Item.Key) = ParseConfiguration(Item.Value)
 				Catch ex As Exception
-					Throw New System.IO.InvalidDataException($"Configuration '{Item.Key}': {ex.Message}", ex)
+					ConfigurationErrors(Item.Key) = ex.Message
 				End Try
 			Next
 		Finally
@@ -91,36 +128,92 @@ Public Module ConfigurationFile
 		Return Result
 	End Function
 
-	Private Function ParseConfiguration(Bytes As Byte()) As ConfigurationNode
-		Dim Position As Integer = HeaderLength
-		Dim Root As ConfigurationNode = ParseNode(Bytes, Position)
+	' 20261001 The first header value is the configuration type: 0 for an ordinary
+	' display configuration, 1 for an exploded view.  An exploded view has the
+	' same occurrence tree, followed by the explosion data (events, groups,
+	' transforms), which isn't needed here and is skipped.
+	Private Const ConfigurationTypeDisplay As UInteger = 0UI
+	Private Const ConfigurationTypeExploded As UInteger = 1UI
 
-		' Every stream seen so far parses to exactly its full length.  Anything else
-		' means the format isn't what we think it is, and the result can't be trusted.
-		If Position <> Bytes.Length Then
+	Private Function ParseConfiguration(Bytes As Byte()) As ConfigurationNode
+		Dim Position As Integer = 0
+		Dim ConfigurationType As UInteger = ReadUInt32(Bytes, Position)
+
+		If Not (ConfigurationType = ConfigurationTypeDisplay OrElse ConfigurationType = ConfigurationTypeExploded) Then
+			Throw New System.IO.InvalidDataException($"Unrecognized configuration type {ConfigurationType}")
+		End If
+
+		Dim Format As New NodeFormat
+		Format.Version = ReadUInt32(Bytes, Position)
+		ReadUInt32(Bytes, Position)  ' Looks like a count of times this configuration was saved; not needed
+		ReadUInt32(Bytes, Position)
+
+		Select Case Format.Version
+			Case 4UI
+				Format.HasFlags2 = False
+			Case 5UI
+				Dim SubFormat As UInteger = ReadUInt32(Bytes, Position)
+				Select Case SubFormat
+					Case 1UI
+						Format.HasFlags2 = False
+					Case 2UI
+						Format.HasFlags2 = True
+					Case Else
+						Throw New System.IO.InvalidDataException($"Unrecognized format version {Format.Version}, subformat {SubFormat}")
+				End Select
+			Case 2UI
+				' Applying the configuration in a current Solid Edge and saving the
+				' assembly rewrites it in the current format (seen with SE2025).
+				Throw New System.IO.InvalidDataException("Older format (version 2) not supported; apply the configuration and save the assembly to update it")
+			Case Else
+				Throw New System.IO.InvalidDataException($"Unrecognized format version {Format.Version}")
+		End Select
+
+		Dim Root As ConfigurationNode = ParseNode(Bytes, Position, Format)
+
+		' Every ordinary configuration seen so far parses to exactly its full length.
+		' Anything else means the format isn't what we think it is, and the result
+		' can't be trusted.
+		If ConfigurationType = ConfigurationTypeDisplay AndAlso Position <> Bytes.Length Then
 			Throw New System.IO.InvalidDataException($"Unrecognized format (parsed {Position} of {Bytes.Length} bytes)")
 		End If
 
 		Return Root
 	End Function
 
-	Private Function ParseNode(Bytes As Byte(), ByRef Position As Integer) As ConfigurationNode
+	Private Function ParseNode(Bytes As Byte(), ByRef Position As Integer, Format As NodeFormat) As ConfigurationNode
 		Dim NodePosition As Integer = Position
 
 		Dim Node As New ConfigurationNode
 		Node.Flags = ReadUInt32(Bytes, Position)
-		Node.Flags2 = ReadUInt32(Bytes, Position)
+		If Format.HasFlags2 Then Node.Flags2 = ReadUInt32(Bytes, Position)
 		Dim ID As UInteger = ReadUInt32(Bytes, Position)
 
 		' Fail at the first node that doesn't fit the known format, with enough
 		' detail to see what's new, rather than misreading everything after it.
 		Dim NodeType As UInteger = Node.Flags >> 28
-		If Not (NodeType = 4UI OrElse NodeType = 8UI OrElse NodeType = 9UI) OrElse ID > CUInt(Integer.MaxValue) Then
+		Dim KnownType As Boolean
+		If Format.Version = 4UI Then
+			' Version 4 can identify occurrences by ID too (4, 9), mixed or not with names (6, B).
+			KnownType = NodeType = 4UI OrElse NodeType = 6UI OrElse NodeType = 8UI OrElse NodeType = 9UI OrElse NodeType = &HBUI
+		Else
+			KnownType = NodeType = 4UI OrElse NodeType = 8UI OrElse NodeType = 9UI
+		End If
+		If Not KnownType OrElse ID > CUInt(Integer.MaxValue) Then
 			Throw New System.IO.InvalidDataException(
-				$"Unrecognized node at byte offset {NodePosition}: flags 0x{Node.Flags:X8}, second value 0x{Node.Flags2:X8}, ID 0x{ID:X8}")
+				$"Unrecognized node at byte offset {NodePosition} (format version {Format.Version}): flags 0x{Node.Flags:X8}, second value 0x{Node.Flags2:X8}, ID 0x{ID:X8}")
 		End If
 
 		Node.OccurrenceID = CInt(ID)
+
+		If Node.IsNamed Then
+			Dim NameLength As UInteger = ReadUInt32(Bytes, Position)
+			If NameLength > CUInt(Bytes.Length - Position) Then
+				Throw New System.IO.InvalidDataException($"Name length {NameLength} at byte offset {NodePosition} exceeds stream length")
+			End If
+			Node.OccurrenceName = System.Text.Encoding.ASCII.GetString(Bytes, Position, CInt(NameLength)).TrimEnd(Chr(0))
+			Position += CInt(NameLength)
+		End If
 
 		If Node.IsAssembly Then
 			Dim EntryCount As UInteger = ReadUInt32(Bytes, Position)
@@ -129,22 +222,22 @@ Public Module ConfigurationFile
 			End If
 			Position += CInt(EntryCount) * EntryLength
 
-			ParseChildren(Node, Bytes, Position)
+			ParseChildren(Node, Bytes, Position, Format)
 
 		ElseIf Node.IsCollapsed Then
-			ParseChildren(Node, Bytes, Position)
+			ParseChildren(Node, Bytes, Position, Format)
 		End If
 
 		Return Node
 	End Function
 
-	Private Sub ParseChildren(Node As ConfigurationNode, Bytes As Byte(), ByRef Position As Integer)
+	Private Sub ParseChildren(Node As ConfigurationNode, Bytes As Byte(), ByRef Position As Integer, Format As NodeFormat)
 		Dim ChildCount As UInteger = ReadUInt32(Bytes, Position)
-		If ChildCount > CUInt((Bytes.Length - Position) \ EntryLength) Then
+		If ChildCount > CUInt((Bytes.Length - Position) \ MinimumNodeLength) Then
 			Throw New System.IO.InvalidDataException($"Child count {ChildCount} exceeds stream length")
 		End If
 		For i As Integer = 1 To CInt(ChildCount)
-			Node.Children.Add(ParseNode(Bytes, Position))
+			Node.Children.Add(ParseNode(Bytes, Position, Format))
 		Next
 	End Sub
 

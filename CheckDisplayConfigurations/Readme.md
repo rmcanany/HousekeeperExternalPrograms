@@ -18,6 +18,8 @@ To fix it, activate the configuration, check that it looks right, and save it ag
 - The configurations are read from the `.cfg` file Solid Edge keeps next to the assembly, with the same name. If that file is missing, an error is reported. Configuration files with a different name are not supported.
 - The program doesn't change the assembly or the `.cfg` file. Solid Edge locks the `.cfg` file while the assembly is open, so the program reads a temporary copy.
 - Family of Assemblies files are not currently supported.
+- Configurations saved in very old versions of Solid Edge use a format the program can't read, and are reported as not checked. To update one, apply the configuration and save the assembly.
+- If a subassembly's file can't be found, it is reported, and the configurations aren't checked below that point.
 
 ## Troubleshooting
 

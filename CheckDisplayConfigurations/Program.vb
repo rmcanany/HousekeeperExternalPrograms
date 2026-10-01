@@ -238,84 +238,147 @@ Module Program
 		End If
 
 		Dim Configurations As SortedDictionary(Of String, ConfigurationNode)
+		Dim ConfigurationErrors As New SortedDictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 		Try
-			Configurations = ConfigurationFile.ReadConfigurations(CfgFilename)
+			Configurations = ConfigurationFile.ReadConfigurations(CfgFilename, ConfigurationErrors)
 		Catch ex As Exception
 			ErrorMessageList.Add($"Could not read '{IO.Path.GetFileName(CfgFilename)}': {ex.Message}")
 			Exit Sub
 		End Try
 
-		' Occurrences by ID for each assembly document, so a subassembly used in
-		' several places, or checked for several configurations, is only walked once.
-		Dim OccurrenceCache As New Dictionary(Of String, Dictionary(Of Integer, SolidEdgeAssembly.Occurrence))(StringComparer.OrdinalIgnoreCase)
+		For Each Item In ConfigurationErrors
+			ErrorMessageList.Add($"Could not check display configuration '{Item.Key}': {Item.Value}")
+		Next
+
+		' Occurrences by ID and name for each assembly document, so a subassembly
+		' used in several places, or checked for several configurations, is only
+		' walked once.
+		Dim OccurrenceCache As New Dictionary(Of String, OccurrenceIndex)(StringComparer.OrdinalIgnoreCase)
 
 		Dim DiagnosticLines As New List(Of String)
 		DiagnosticLines.Add($"Assembly: {Filename}")
+
+		For Each Item In ConfigurationErrors
+			DiagnosticLines.Add("")
+			DiagnosticLines.Add($"Configuration '{Item.Key}'")
+			DiagnosticLines.Add($"  not checked: {Item.Value}")
+		Next
+
+		' Subassembly files whose contents couldn't be compared, eg. because the
+		' file is missing, with the reason.  Not treated as missing occurrences,
+		' which would report a configuration out of date when it may not be.
+		' Reported once per file -- that's what the user can fix -- rather than once
+		' per instance and configuration.  Where each one is used is in the
+		' diagnostic file.
+		Dim UncheckedSubassemblies As New SortedDictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
 		For Each Item In Configurations
 			DiagnosticLines.Add("")
 			DiagnosticLines.Add($"Configuration '{Item.Key}'")
 
 			Dim MissingEntries As New List(Of String)
-			CompareConfigurationNode(Item.Value, tmpSEDoc, "", "    ", OccurrenceCache, MissingEntries, DiagnosticLines)
+			CompareConfigurationNode(Item.Value, tmpSEDoc, "", "    ", OccurrenceCache, MissingEntries, UncheckedSubassemblies, DiagnosticLines)
 
 			If MissingEntries.Count > 0 Then
-				ErrorMessageList.Add($"Display configuration '{Item.Key}': One or more parts have been deleted from the assembly since the configuration was saved")
+				ErrorMessageList.Add($"Display configuration '{Item.Key}' out of date")
 				DiagnosticLines.Add($"  {MissingEntries.Count} missing: {String.Join(", ", MissingEntries)}")
 			End If
+		Next
+
+		For Each Item In UncheckedSubassemblies
+			ErrorMessageList.Add($"Could not check subassembly '{Item.Key}': {Item.Value}")
 		Next
 
 		IO.File.WriteAllLines(String.Format("{0}\configuration_diagnostic.txt", System.AppDomain.CurrentDomain.BaseDirectory), DiagnosticLines)
 
 	End Sub
 
+	' What OccurrenceDocument throws when the occurrence's file is missing.
+	Private Const STG_E_FILENOTFOUND As Integer = &H80030002
+
 	Private Sub CompareConfigurationNode(
 		Node As ConfigurationNode,
 		AssemblyDoc As SolidEdgeAssembly.AssemblyDocument,
 		ParentPath As String,
 		Indent As String,
-		OccurrenceCache As Dictionary(Of String, Dictionary(Of Integer, SolidEdgeAssembly.Occurrence)),
+		OccurrenceCache As Dictionary(Of String, OccurrenceIndex),
 		MissingEntries As List(Of String),
+		UncheckedSubassemblies As SortedDictionary(Of String, String),
 		DiagnosticLines As List(Of String))
 
-		Dim CurrentOccurrences = GetOccurrencesByID(AssemblyDoc, OccurrenceCache)
+		Dim CurrentOccurrences = GetOccurrenceIndex(AssemblyDoc, OccurrenceCache)
 
 		For Each Child As ConfigurationNode In Node.Children
 			Dim Visibility As String = If(Child.IsHidden, "hidden", "shown")
 			If Child.IsCollapsed Then Visibility &= ", collapsed"
 
+			' Older (version 4) configurations identify occurrences by name, newer ones by ID.
 			Dim Occ As SolidEdgeAssembly.Occurrence = Nothing
-			If Not CurrentOccurrences.TryGetValue(Child.OccurrenceID, Occ) Then
-				MissingEntries.Add($"{ParentPath}occurrence ID {Child.OccurrenceID}")
-				DiagnosticLines.Add($"{Indent}ID {Child.OccurrenceID} ({Visibility}) -- MISSING")
+			Dim Found As Boolean
+			Dim Description As String
+			If Child.OccurrenceName IsNot Nothing Then
+				Found = CurrentOccurrences.ByName.TryGetValue(Child.OccurrenceName, Occ)
+				Description = $"occurrence '{Child.OccurrenceName}'"
+			Else
+				Found = CurrentOccurrences.ByID.TryGetValue(Child.OccurrenceID, Occ)
+				Description = $"occurrence ID {Child.OccurrenceID}"
+			End If
+
+			If Not Found Then
+				MissingEntries.Add($"{ParentPath}{Description}")
+				DiagnosticLines.Add($"{Indent}{Description} ({Visibility}) -- MISSING")
 				Continue For
 			End If
 
-			DiagnosticLines.Add($"{Indent}ID {Child.OccurrenceID} ({Visibility}) = {Occ.Name}")
+			DiagnosticLines.Add($"{Indent}{Description} ({Visibility}) = {Occ.Name}")
 
 			If Child.Children.Count > 0 AndAlso Occ.Subassembly Then
-				Dim SubDoc = TryCast(Occ.OccurrenceDocument, SolidEdgeAssembly.AssemblyDocument)
+				' The Try covers only getting the document, so an error at a deeper
+				' level isn't mistaken for this subassembly being unavailable.
+				Dim SubDoc As SolidEdgeAssembly.AssemblyDocument = Nothing
+				Dim Reason As String = "document not available"
+				Try
+					SubDoc = TryCast(Occ.OccurrenceDocument, SolidEdgeAssembly.AssemblyDocument)
+					If SubDoc IsNot Nothing AndAlso SubDoc.Occurrences Is Nothing Then
+						SubDoc = Nothing
+						Reason = "occurrences not available"
+					End If
+				Catch ex As System.Runtime.InteropServices.COMException When ex.HResult = STG_E_FILENOTFOUND
+					Reason = "file not found"
+				Catch ex As Exception
+					Reason = ex.Message.Trim()
+				End Try
+
 				If SubDoc Is Nothing Then
-					DiagnosticLines.Add($"{Indent}    (subassembly not loaded, not checked)")
+					Dim SubFilename As String = Occ.OccurrenceFileName
+					If String.IsNullOrEmpty(SubFilename) Then SubFilename = Occ.Name
+					UncheckedSubassemblies(IO.Path.GetFileName(SubFilename)) = Reason
+					DiagnosticLines.Add($"{Indent}    (not checked: {Reason}: {SubFilename})")
 				Else
-					CompareConfigurationNode(Child, SubDoc, $"{ParentPath}{Occ.Name} > ", Indent & "    ", OccurrenceCache, MissingEntries, DiagnosticLines)
+					CompareConfigurationNode(Child, SubDoc, $"{ParentPath}{Occ.Name} > ", Indent & "    ", OccurrenceCache, MissingEntries, UncheckedSubassemblies, DiagnosticLines)
 				End If
 			End If
 		Next
 
 	End Sub
 
-	Private Function GetOccurrencesByID(
-		AssemblyDoc As SolidEdgeAssembly.AssemblyDocument,
-		OccurrenceCache As Dictionary(Of String, Dictionary(Of Integer, SolidEdgeAssembly.Occurrence))
-		) As Dictionary(Of Integer, SolidEdgeAssembly.Occurrence)
+	Private Class OccurrenceIndex
+		Public ByID As New Dictionary(Of Integer, SolidEdgeAssembly.Occurrence)
+		Public ByName As New Dictionary(Of String, SolidEdgeAssembly.Occurrence)(StringComparer.OrdinalIgnoreCase)
+	End Class
 
-		Dim Result As Dictionary(Of Integer, SolidEdgeAssembly.Occurrence) = Nothing
+	Private Function GetOccurrenceIndex(
+		AssemblyDoc As SolidEdgeAssembly.AssemblyDocument,
+		OccurrenceCache As Dictionary(Of String, OccurrenceIndex)
+		) As OccurrenceIndex
+
+		Dim Result As OccurrenceIndex = Nothing
 		If OccurrenceCache.TryGetValue(AssemblyDoc.FullName, Result) Then Return Result
 
-		Result = New Dictionary(Of Integer, SolidEdgeAssembly.Occurrence)
+		Result = New OccurrenceIndex
 		For Each Occ As SolidEdgeAssembly.Occurrence In AssemblyDoc.Occurrences
-			Result(Occ.OccurrenceID) = Occ
+			Result.ByID(Occ.OccurrenceID) = Occ
+			Result.ByName(Occ.Name) = Occ
 		Next
 
 		OccurrenceCache(AssemblyDoc.FullName) = Result
