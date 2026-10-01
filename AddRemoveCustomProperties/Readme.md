@@ -4,7 +4,8 @@ This program adds and/or removes Custom file properties.
 Actually, it only removes them.  I didn't get around to the adding part.
 
 You identify which properties to remove in a text file 
-named `property_list.txt`.  The file must reside in the 
+named `property_list.txt`.  It is created the first time
+the program runs; it won't be there before that.  The file must reside in the 
 same directory as the executable.
 
 There are two operating modes for removal. 

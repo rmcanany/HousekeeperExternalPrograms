@@ -1,13 +1,13 @@
 $StartupPath = "C:\data\CAD\scripts\HousekeeperExternalPrograms\Snippets"
 
 $DLLs = (
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgeFramework.dll",
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgeFrameworkSupport.dll",
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgeConstants.dll",
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgePart.dll",
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgeAssembly.dll",
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgeDraft.dll",
-    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Debug\Interop.SolidEdgeGeometry.dll"
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgeFramework.dll",
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgeFrameworkSupport.dll",
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgeConstants.dll",
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgePart.dll",
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgeAssembly.dll",
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgeDraft.dll",
+    "C:\data\CAD\scripts\SolidEdgeHousekeeper\bin\Release\Interop.SolidEdgeGeometry.dll"
     )
 
 $Source = @"
@@ -17,7 +17,7 @@ Imports System.Collections.Generic
 Imports Microsoft.VisualBasic
 Imports System.Linq
 
-Public Class Snippet52741
+Public Class Snippet96183
 
     Public Shared Function RunSnippet(StartupPath As String) As Integer
         Dim ExitStatus As Integer = 0
@@ -40,15 +40,11 @@ Public Class Snippet52741
             Dim DocType = IO.Path.GetExtension(SEDoc.Fullname)
 
             Try
-                If DocType = ".dft" Then
-                    SEApp.StartCommand(10202)
-                Else
-                    SEApp.StartCommand(32810)
-                End If
+                SEApp.WindowState = 0
                 SEApp.DoIdle()
-                SEDoc.Save()
+                SEApp.Height = 410
+                SEApp.Width = 600
                 SEApp.DoIdle()
-                'ErrorMessageLis.Add("No errors")
             Catch ex As Exception
                 ExitStatus = 1
                 ErrorMessageList.Add(String.Format("{0}", ex.Message))
@@ -82,9 +78,9 @@ End Class
 
 Add-Type -TypeDefinition $Source -ReferencedAssemblies $DLLs -Language VisualBasic
 
-[Snippet52741]::LoadLibrary($DLLs)
+[Snippet96183]::LoadLibrary($DLLs)
 
-$ExitStatus = [Snippet52741]::RunSnippet($StartupPath)
+$ExitStatus = [Snippet96183]::RunSnippet($StartupPath)
 
 Function ExitWithCode($exitcode) {
   $host.SetShouldExit($exitcode)
