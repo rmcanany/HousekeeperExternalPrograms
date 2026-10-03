@@ -290,7 +290,7 @@ Module Module1
 			For Each s As String In ErrorMessageList
 				msg = String.Format("{0}{1}{2}", msg, Chr(13), s)
 			Next
-			MsgBox(msg)
+			'MsgBox(msg)
 		End If
 
 	End Sub

@@ -102,7 +102,7 @@ Module Module1
         Dim Suffix As String = "Copy"
         Dim StartupPath As String = AppDomain.CurrentDomain.BaseDirectory
 
-        Dim Filename As String = String.Format("{0}suffix.txt", StartupPath)
+        Dim Filename As String = String.Format("{0}program_settings.txt", StartupPath)
 
         Try
             Suffix = IO.File.ReadAllLines(Filename)(0)

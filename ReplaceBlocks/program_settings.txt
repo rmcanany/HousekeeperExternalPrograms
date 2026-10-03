@@ -1,0 +1,34 @@
+' program_settings.txt
+' Any line preceeded with the comment character (a single quote (')) is ignored
+' Blank lines are also ignored
+
+' As delivered, all lines are commented out
+' Edit according to your need
+
+' The TemplateName is the file containing the replacement blocks
+' Only one template file is processed
+' TemplateName = C:\data\CAD\BlockLibrary.dft
+TemplateName = C:\data\CAD\scripts\test_files\20230102_command_test_files\ReplaceBlock\BlockLibrary.dft
+
+' List of blocks to replace
+' Format is ReplaceBlock = <name of the block to replace>, <name of the block to replace it>
+' Any number of these variables are processed
+' Examples
+' ReplaceBlock = circle, circle
+' ReplaceBlock = square, slot
+
+' List of blocks to add
+' Format is AddBlock = <name of the block to add from the template>
+' Any number of these variables are processed
+' Examples
+' AddBlock = circle
+' AddBlock = square
+AddBlock = slot
+
+' List of blocks to delete
+' Format is DeleteBlock = <name of the block to delete from the file>
+' Any number of these variables are processed
+' Examples
+' DeleteBlock = circle
+' DeleteBlock = square
+'DeleteBlock = square

@@ -42,7 +42,7 @@ Module Module1
                 SEApp.DoIdle()
             Catch ex As Exception
                 ExitStatus = 1
-                Console.WriteLine(String.Format("An error occurred disabling preview mode: {0}", ex.Message))
+                ErrorMessageList.Add(String.Format("An error occurred disabling preview mode: {0}", ex.Message))
             End Try
 
             Try
@@ -54,7 +54,8 @@ Module Module1
                 SEApp.DoIdle()
             Catch ex As Exception
                 ExitStatus = 1
-                Console.WriteLine(String.Format("An error occurred enabling preview mode: {0}", ex.Message))
+                Console.WriteLine()
+                ErrorMessageList.Add(String.Format("An error occurred enabling preview mode: {0}", ex.Message))
             End Try
 
         Else
@@ -64,10 +65,13 @@ Module Module1
                 SEApp.DoIdle()
             Catch ex As Exception
                 ExitStatus = 1
-                Console.WriteLine(String.Format("An error occurred saving the file: {0}", ex.Message))
+                ErrorMessageList.Add(String.Format("An error occurred saving the file: {0}", ex.Message))
             End Try
         End If
 
+        If ExitStatus = 1 Then
+            SaveErrorMessages(ErrorMessageList)
+        End If
 
         Console.WriteLine("SaveAndTogglePreviewGeometry complete")
 

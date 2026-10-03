@@ -1,0 +1,12 @@
+' Select the OperatingMode by uncommenting the appropriate line.  Don't leave both uncommented.
+' The comment character is a single quote, like the one at the beginning of this line.
+'
+' To delete properties in the file that ARE on the list, use OperatingMode Remove.
+' To delete properties in the file that ARE NOT on the list, use OperatingMode RemoveAllExcept.
+'
+' OperatingMode Remove
+' OperatingMode RemoveAllExcept
+'
+Some Property
+Another One
+' A Third One (This one is commented out.  It will not be processed.)

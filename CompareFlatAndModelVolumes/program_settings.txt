@@ -1,0 +1,6 @@
+' Program settings
+
+' This sets the threshold for deciding if the volumes match.
+' The formula is (|MV - FPV|) / MV
+' Where MV is the model volume, FPV is the flat pattern volume, and || indicates absolute value.
+Threshold = 1e-7

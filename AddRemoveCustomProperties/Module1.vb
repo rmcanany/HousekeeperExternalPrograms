@@ -38,9 +38,9 @@ Module Module1
 			Proceed = False
 			ExitCode = 1
 			If OperatingModeCount = 0 Then
-				ErrorMessageList.Add("No OperatingMode specified in property_list.txt")
+				ErrorMessageList.Add("No OperatingMode specified in program_settings.txt")
 			Else
-				ErrorMessageList.Add("Multiple OperatingModes specified in property_list.txt")
+				ErrorMessageList.Add("Multiple OperatingModes specified in program_settings.txt")
 			End If
 		End If
 
@@ -134,7 +134,7 @@ Module Module1
 		Dim Line As String
 		Dim TrimmedLine As String
 
-		Dim Filename As String = String.Format("{0}\property_list.txt", StartupPath)
+		Dim Filename As String = String.Format("{0}\program_settings.txt", StartupPath)
 
 		Try
 			tmpRemoveProps = IO.File.ReadAllLines(Filename).ToList
