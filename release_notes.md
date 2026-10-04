@@ -1,11 +1,26 @@
-![Logo](logo.png)
+<div class="center">
+  <p align=center>
+  <img src="logo.png" width=50%;>
+  <p align=center>
+  <span class="description">Robert McAnany 2026</span>
+</div>
+
 # Release Notes
+
 Companion repo with instructions and program examples for the 
 Solid Edge Housekeeper `Run external program` task.
 
+## V2026.2
+
+Added a new external program, `CheckDisplayConfigurations`.  Added code snippets `FaceStylesExport`, `FaceStylesImport`, `ModifyFaceStyle`, `UnitsToANSI`, and `UnitsToISO`.  
+
+Updated the code snippet documentation to better describe how to find and navigate the API to help build your own.
+
+Changed all external program parameter file names to `program_setting.txt`, mostly to simplify the newly-automated Release creation script.
+
 ## V2026.1
 
-Added ReplaceOLELinks, UpdatePartStyleFromTemplate and several Snippet examples.
+Added `ReplaceOLELinks`, `UpdatePartStyleFromTemplate` and several Snippet examples.
 
 ## V2025.3
 

@@ -1,7 +1,11 @@
-![Logo](logo.png)
+<div class="center">
+  <p align=center>
+  <img src="logo.png" width=50%;>
+  <p align=center>
+  <span class="description">Robert McAnany 2026</span>
+</div>
 
 # Solid Edge Housekeeper External Programs
-2026 Robert McAnany
 
 Description and examples for Solid Edge Housekeeper's `Run External Program` task.
 

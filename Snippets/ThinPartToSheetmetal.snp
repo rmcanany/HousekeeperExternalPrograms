@@ -1,4 +1,13 @@
-Dim Models = SEDoc.Models
+Dim Models As SolidEdgePart.Models = Nothing
+
+Select Case DocType
+    Case ".par"
+        Dim tmpSEDoc As SolidEdgePart.PartDocument = CType(SEDoc, SolidEdgePart.PartDocument)
+        Models = tmpSEDoc.Models
+    Case ".psm"
+        Dim tmpSEDoc As SolidEdgePart.SheetMetalDocument = CType(SEDoc, SolidEdgePart.SheetMetalDocument)
+        Models = tmpSEDoc.Models
+End Select
 
 If Models.Count = 0 Then
     ExitStatus = 1
